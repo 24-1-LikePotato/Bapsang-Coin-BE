@@ -91,7 +91,7 @@ DATABASES = {
         'USER': get_secret('USER'),
         'PASSWORD': get_secret('PASSWORD'),
         'HOST': get_secret('HOST'),
-        'PORT': get_secret('PORT', cast=int),
+        'PORT': get_secret('PORT'),
         'OPTIONS': get_secret('OPTIONS'),
     }
 }
