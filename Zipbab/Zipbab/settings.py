@@ -1,5 +1,6 @@
 from pathlib import Path
 from datetime import timedelta
+import json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -85,15 +86,13 @@ WSGI_APPLICATION = 'zipbab.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'zipbab-db',
-        'USER':'master',
-        'PASSWORD':'zipbab0000',
-        'HOST': 'zipbab-mysql.cx2ugw86egw2.ap-northeast-2.rds.amazonaws.com',
-        'PORT': '3306',
-        'OPTIONS': {
-            'init_command' : 'SET sql_mode="STRICT_TRANS_TABLES"'
-        }
+        'ENGINE': get_secret('ENGINE'),
+        'NAME': get_secret('NAME'),
+        'USER': get_secret('USER'),
+        'PASSWORD': get_secret('PASSWORD'),
+        'HOST': get_secret('HOST'),
+        'PORT': get_secret('PORT', cast=int),
+        'OPTIONS': get_secret('OPTIONS'),
     }
 }
 
