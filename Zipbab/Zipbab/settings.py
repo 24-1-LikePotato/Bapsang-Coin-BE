@@ -1,9 +1,29 @@
 from pathlib import Path
 from datetime import timedelta
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-rkqln(2q&g*$#s0tg0dj5ow^$w6zy^os=jl+*8idgixbsht0s3'
+# secrets.json 파일에서 시크릿 키 값 로드하기
+secret_file = BASE_DIR / 'secrets.json'
+
+# STATIC_URL = '/static/'
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "static"),  # 프로젝트 루트의 static 디렉토리
+# ]
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+with open(secret_file) as f:
+    secrets = json.loads(f.read())
+
+def get_secret(setting, secrets=secrets):
+    try:
+        return secrets[setting]
+    except KeyError:
+        raise ImproperlyConfigured(f'Set the {setting} environment variable')
+
+# 시크릿키와 서명키 가져오기
+SECRET_KEY = get_secret('SECRET_KEY')
 
 DEBUG = True
 
