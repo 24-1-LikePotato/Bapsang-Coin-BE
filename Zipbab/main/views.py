@@ -6,24 +6,22 @@ from .models import Fridge,FridgeIngredient,User
 from .serializers import FridgeSerializer
 
 class FridgeDetailView(APIView):
-    def get(self, request, user_id):
+    
+    def delete(self, request, user_id):
+        fridge_ingredient_id = request.data.get('fridge_ingredient_id')
 
-        # 등록된 유저가 없다면?
+        if not fridge_ingredient_id:
+            return Response({'message': 'fridge_ingredient_id가 제공되지 않았습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # BODY로 받은 fridge_ingredient_id로 객체 찾기
         try:
-            user = User.objects.get(pk=user_id)
-        except User.DoesNotExist:
-            return Response({'message': '등록된 유저가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+            fridge_ingredient = FridgeIngredient.objects.get(pk=fridge_ingredient_id)
         
-        fridge = get_object_or_404(Fridge, user_id=user_id)
-        fridge_ingredients = FridgeIngredient.objects.filter(fridge=fridge)
-
-        if not fridge_ingredients.exists():
-            return Response({'message': '등록한 식재료가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        except FridgeIngredient.DoesNotExist:
+            return Response({'message': '해당 fridge_ingredient가 존재하지 않거나 유효하지 않습니다.'}, status=status.HTTP_404_NOT_FOUND)
         
-        serializer = FridgeSerializer(fridge)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    
+        # Delete the fridge ingredient
+        fridge_ingredient.delete()
+        return Response({'message': '식재료가 정상적으로 삭제되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
 
         
