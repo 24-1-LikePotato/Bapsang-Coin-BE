@@ -14,13 +14,6 @@ class FridgeDetailView(APIView):
         except User.DoesNotExist:
             return Response({'message': '등록된 유저가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
         
-        # 등록된 냉장고가 없다면? : 이 경우는 없어야하는데 혹시 모르니깐
-        try:
-            fridge = Fridge.objects.get(user=user)
-        except Fridge.DoesNotExist:
-            return Response({'message': '등록된 냉장고가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
-        
-
         fridge = get_object_or_404(Fridge, user_id=user_id)
         fridge_ingredients = FridgeIngredient.objects.filter(fridge=fridge)
 
