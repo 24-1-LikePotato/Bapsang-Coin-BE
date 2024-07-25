@@ -9,7 +9,7 @@ class FridgeIngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FridgeIngredient
-        fields = ['ingredient_name','ingredient_pk', 'days_until_expiration', 'is_expiring_soon']
+        fields = ['id','ingredient_name','ingredient_pk', 'days_until_expiration', 'is_expiring_soon']
 
     def get_ingredient_name(self, obj):
         return obj.ingredient.name
