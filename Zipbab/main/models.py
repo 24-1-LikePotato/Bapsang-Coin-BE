@@ -10,7 +10,7 @@ class Fridge(models.Model):
 class Ingredient(models.Model):
     name = models.CharField(max_length=50,verbose_name='품종')
     item = models.CharField(max_length=50,verbose_name='품목')
-    code = models.CharField(max_length=50,verbose_name='식품코드')
+    code = models.CharField(max_length=50,verbose_name='식품코드', default='0')
 
     def __str__(self) -> str:
         return self.name
