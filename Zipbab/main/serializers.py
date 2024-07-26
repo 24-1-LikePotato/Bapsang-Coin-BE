@@ -5,12 +5,15 @@ from django.utils import timezone
 class FridgeIngredientCreateSerializer(serializers.Serializer):
     ingredient_name = serializers.CharField(max_length=50)
     expiration_date = serializers.DateField()
+
     def create(self, validated_data):
         ingredient_name = validated_data['ingredient_name']
         expiration_date = validated_data['expiration_date']
         
-        # Get or create the ingredient
-        ingredient, created = Ingredient.objects.get_or_create(name=ingredient_name)
+        # Get the ingredient with the smallest id if it exists, else create a new one
+        ingredient = Ingredient.objects.filter(name=ingredient_name).order_by('id').first()
+        if not ingredient:
+            ingredient = Ingredient.objects.create(name=ingredient_name)
         
         # Create the FridgeIngredient
         FridgeIngredient.objects.create(
