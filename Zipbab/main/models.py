@@ -9,7 +9,9 @@ class Fridge(models.Model):
         return f"{self.user.nickname}의 냉장고"
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=50,verbose_name='Name')
+    name = models.CharField(max_length=50,verbose_name='품종', default='NONE')
+    item = models.CharField(max_length=50,verbose_name='품목', default='NONE')
+    code = models.CharField(max_length=50,verbose_name='식품코드', default='0')
 
     def __str__(self) -> str:
         return self.name
