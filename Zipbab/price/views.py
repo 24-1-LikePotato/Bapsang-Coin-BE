@@ -129,9 +129,14 @@ class RandomPriceDropView(APIView):
             no_change_items = list(ChangePriceDay.objects.filter(updown=2))
             # 하락한 식재료와 가격 변동 없는 식재료를 합침
             combined_items = price_down_items + no_change_items
-            # 총 5개가 되도록 랜덤 선택
-            selected_items = random.sample(combined_items, min(5, len(combined_items)))
-        else:
+
+            if len(combined_items) < 5: # (하락한 식재료 + 변동 없는 식재료) 가 5개 미만이면
+                all_items = list(ChangePriceDay.objects.all())
+                selected_items = random.sample(all_items, min(5, len(all_items)))
+            else: # 총 5개가 되도록 랜덤 선택
+                selected_items = random.sample(combined_items, min(5, len(combined_items)))
+
+        else: # 하락한 식재료가 5개 이상인 경우
             # 하락한 식재료들 중에서 랜덤하게 5개 선택
             selected_items = random.sample(price_down_items, 5)
         
@@ -139,3 +144,5 @@ class RandomPriceDropView(APIView):
         serialized_data = TodayIngredientSerializer(selected_items, many=True).data
 
         return Response(serialized_data, status=status.HTTP_200_OK)
+
+
