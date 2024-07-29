@@ -5,6 +5,6 @@ from .views import FridgeDetailView
 
 urlpatterns = [
 
-    path('fridge/<int:user_id>/', FridgeDetailView.as_view(), name='fridge-detail'),
+    path('fridge/<int:user_id>', FridgeDetailView.as_view(), name='fridge-detail'),
 
 ]
