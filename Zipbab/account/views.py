@@ -137,3 +137,5 @@ def kakao_callback(request):
         return res
         # redirect_url = f"{FRONTEND_URL}/login?access={access_token}&refresh={refresh_token}"
         # return HttpResponseRedirect(redirect_url)
+
+
