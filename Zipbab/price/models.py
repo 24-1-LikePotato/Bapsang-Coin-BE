@@ -4,7 +4,11 @@ from main.models import Ingredient
 class ChangePriceMonth(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     month = models.CharField(max_length=7)  # 'YYYY-MM' 형식
-    average_price = models.IntegerField()
+    forty = models.IntegerField()
+    thirty = models.IntegerField()
+    twenty = models.IntegerField()
+    ten = models.IntegerField()
+    today = models.IntegerField()
     updown = models.IntegerField(choices=[
         (0, 'Up'),
         (1, 'Down'),
@@ -18,13 +22,13 @@ class ChangePriceMonth(models.Model):
 class ChangePriceDay(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     date = models.DateField()  # 일 단위로 저장
-    price = models.IntegerField()
-    updown = models.IntegerField(choices=[
+    price = models.IntegerField() # 가격
+    updown = models.IntegerField(choices=[ # 등락 여
         (0, 'Up'),
         (1, 'Down'),
         (2, 'Same')
     ])
-    updown_percent = models.FloatField()
+    updown_percent = models.FloatField() # 등락율
 
 
     def __str__(self) -> str:
