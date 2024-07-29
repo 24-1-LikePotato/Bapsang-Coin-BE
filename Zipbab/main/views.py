@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from .models import Fridge,FridgeIngredient,User,Recipe
+from .models import Fridge,FridgeIngredient,User,Recipe,Ingredient, RecipeIngredient
 from .serializers import FridgeSerializer,RecipeSerializer
 
 import os
@@ -81,3 +81,25 @@ class RecipeStoreView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"status": "success"}, status=status.HTTP_200_OK)
+
+
+class RecipeIngredientStoreView(APIView):
+    def post(self, request):
+        recipes = Recipe.objects.all()
+        for recipe in recipes:
+            ingredient_list = recipe.ingredient_list
+            ingredients = [ingredient.strip() for ingredient in ingredient_list.split(',')]
+
+            # Clear existing RecipeIngredient relations for the current recipe
+            RecipeIngredient.objects.filter(recipe=recipe).delete()
+
+            # Create new RecipeIngredient relations for the current recipe
+            for ingredient_entry in ingredients:
+                ingredient_name = ingredient_entry.split(' ')[0]
+                ingredient = Ingredient.objects.filter(name__icontains=ingredient_name).first()
+                if ingredient:
+                    RecipeIngredient.objects.create(recipe=recipe, ingredient=ingredient)
+
+        return Response({"message": "All recipe ingredients updated successfully."}, status=status.HTTP_200_OK)
+
+
