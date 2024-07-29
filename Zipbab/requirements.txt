@@ -1,3 +1,4 @@
+APScheduler==3.10.4
 asgiref==3.8.1
 certifi==2024.7.4
 charset-normalizer==3.3.2
@@ -10,7 +11,10 @@ mysql-client==0.0.1
 mysqlclient==2.2.4
 pillow==10.4.0
 PyJWT==2.8.0
+pytz==2024.1
 requests==2.32.3
+six==1.16.0
 sqlparse==0.5.1
 tzdata==2024.1
+tzlocal==5.2
 urllib3==2.2.2

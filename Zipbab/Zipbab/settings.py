@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'price',
     'account',
     'util',
+    'api',
 
     # third-party
     'rest_framework',
