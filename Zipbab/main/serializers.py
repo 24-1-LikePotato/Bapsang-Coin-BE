@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Fridge, FridgeIngredient, Ingredient
+from .models import Fridge, FridgeIngredient, Ingredient,Recipe, Ingredient
 
 class FridgeIngredientSerializer(serializers.ModelSerializer):
     fridge_ingredient_id = serializers.IntegerField(source='id', read_only=True)
@@ -35,3 +35,13 @@ class FridgeSerializer(serializers.ModelSerializer):
     def get_ingredients(self, obj):
         fridge_ingredients = FridgeIngredient.objects.filter(fridge=obj)
         return FridgeIngredientSerializer(fridge_ingredients, many=True).data
+
+class RecipeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = '__all__'
+
+class IngredientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = '__all__'
