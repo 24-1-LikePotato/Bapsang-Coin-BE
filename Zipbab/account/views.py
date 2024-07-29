@@ -139,3 +139,17 @@ def kakao_callback(request):
         # return HttpResponseRedirect(redirect_url)
 
 
+class LogoutView(APIView):
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            return Response({'message': '정상적으로 로그아웃 되었습니다.'}, status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response({'message': '로그아웃에 실패했습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+# 로그인해서 원래 사용하던 토큰을 블랙리스트에 추가시키면 더 이상 토큰을 사용할 수 없기 때문에
+# 프론트에서 사용할 수 없다고 감지하면 새로 로그인하면 됨
