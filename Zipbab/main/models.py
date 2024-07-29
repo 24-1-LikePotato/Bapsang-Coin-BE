@@ -28,7 +28,7 @@ class Recipe(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
     content = models.TextField()
-    ingredient_list = models.TextField()  # 기존 ingredient 필드명 변경
+    ingredient_list = models.TextField() 
     image = models.ImageField(upload_to='images/', blank=True, null=True)
     calorie = models.FloatField()
     carb = models.FloatField()
