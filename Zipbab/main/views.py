@@ -13,16 +13,10 @@ from rest_framework.decorators import api_view
 
 
 @api_view(['GET'])
-def ingredientsearch(request):
-    query = request.GET.get('query','')
-    if query:
-        ingredient = Ingredient.objects.filter(name__icontains=query)
-        if ingredient.exists():
-            changeprice = ChangePriceDay.objects.filter(ingredient=ingredient).order_by('price').first()
-            if changeprice:
-                serializer = ChangePriceDaySerializer(changeprice)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response({"error": "No data found"}, status=status.HTTP_404_NOT_FOUND)
+def recipe(request):
+    recipe = Recipe.objects.all()
+    serializer = RecipeSerializer(recipe, many=True)
+    return Response(serializer.data)
 
 
     
