@@ -13,6 +13,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 import requests
+from decouple import config
 
 
 class ActivateSubscriptionView(APIView):
@@ -31,22 +32,26 @@ class ActivateSubscriptionView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# 나중에 배포하면 꼭 바꾸기 = 카카오 디벨로퍼에서 바꿔야함!
+# 지금 클라이언트 ID도 테스트앱의 ID라 나중에 원래 앱의 클라이언트 ID로 바꿔야 함
+
 BASE_URL = 'http://127.0.0.1:8000/'
 KAKAO_CALLBACK_URI = BASE_URL + 'account/kakao/callback'
-SOCIAL_AUTH_KAKAO_CLIENT_ID ='b3b591e0bea504302e17de1dd109dec2'
+#SOCIAL_AUTH_KAKAO_CLIENT_ID ='b3b591e0bea504302e17de1dd109dec2'
+
 
 
 
 
 def kakao_login(request):
-    client_id = SOCIAL_AUTH_KAKAO_CLIENT_ID
+    client_id = config('SOCIAL_AUTH_KAKAO_CLIENT_ID')
     return redirect(f"https://kauth.kakao.com/oauth/authorize?client_id={client_id}&redirect_uri={KAKAO_CALLBACK_URI}&response_type=code&scope=profile_nickname,profile_image,account_email")
 
 
 
 @api_view(['GET'])
 def kakao_callback(request):
-    rest_api_key = SOCIAL_AUTH_KAKAO_CLIENT_ID
+    rest_api_key = config('SOCIAL_AUTH_KAKAO_CLIENT_ID')
     code = request.GET.get("code")
     kakao_token_uri = "https://kauth.kakao.com/oauth/token"
   
