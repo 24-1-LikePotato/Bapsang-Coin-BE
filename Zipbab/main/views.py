@@ -6,23 +6,16 @@ from .models import Ingredient, Recipe
 from price.models import ChangePriceDay
 from .serializers import IngredientSerializer,ChangePriceDaySerializer,RecipeSerializer
 from rest_framework.decorators import api_view
-
-
-    
-
-
+# Create your views here.
 
 @api_view(['GET'])
-def ingredientsearch(request):
-    query = request.GET.get('query','')
-    if query:
-        ingredient = Ingredient.objects.filter(name__icontains=query)
-        if ingredient.exists():
-            changeprice = ChangePriceDay.objects.filter(ingredient=ingredient).order_by('price').first()
-            if changeprice:
-                serializer = ChangePriceDaySerializer(changeprice)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response({"error": "No data found"}, status=status.HTTP_404_NOT_FOUND)
+def related_recipe(request):
+    changeprice = ChangePriceDay.objects.order_by('price').first()
+    if changeprice:
+        ingredient = changeprice.ingredient
+        recipe = get_object_or_404(Recipe , ingredient=ingredient)
+        serializer = RecipeSerializer(recipe)
+        return  Response(serializer.data, status=status.HTTP_200_OK)
 
 
     
