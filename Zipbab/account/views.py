@@ -44,7 +44,6 @@ def kakao_login(request):
 
 
 
-
 @api_view(['GET'])
 def kakao_callback(request):
     rest_api_key = SOCIAL_AUTH_KAKAO_CLIENT_ID
@@ -62,6 +61,7 @@ def kakao_callback(request):
             'Content-type': 'application/x-www-form-urlencoded;charset=utf-8'
         }
     
+    # 카카오 토큰 받기
     token_req = requests.post(kakao_token_uri, data=request_data, headers=token_headers)
     token_req_json = token_req.json()
     error = token_req_json.get("error")
@@ -70,6 +70,7 @@ def kakao_callback(request):
         raise ValueError(error)
     access_token = token_req_json["access_token"]
     
+    # 카카오 토큰을 헤더에 넣어 프로필 정보 받기 요청
     profile_request = requests.get(
         "https://kapi.kakao.com/v2/user/me",
         headers={"Authorization": f"Bearer ${access_token}",})
@@ -80,33 +81,28 @@ def kakao_callback(request):
 
         if error is not None:
             raise ValueError(error)
-        print("profile_json : ",profile_json)
+        
         user_nickname = profile_json['kakao_account']["profile"].get("nickname")
         user_email = profile_json["kakao_account"].get("email")
+   
     else:
         raise ValueError(profile_request.status_code)
         
     
-    
+    # 유저 정보가 있으면 그대로 로그인하기
     try:
         user = User.objects.get(email=user_email)
-
-        fridge = Fridge.objects.create(user=user)
-        fridge.save()
         
-        user_serializer = UserSerializer(user)
+        # 토큰 발급하기
         token = TokenObtainPairSerializer.get_token(user)
         refresh_token = str(token)
         access_token = str(token.access_token)
+
         res = JsonResponse(
             {
-                "user": user_serializer.data,
-                "uid":user.pk,
-                "message": "login successs",
-                "token": {
-                    "access": access_token,
-                    "refresh": refresh_token,
-                },
+                "user_id":user.pk,
+                "access_token": access_token,
+                "refresh_token": refresh_token,
             },
             status=status.HTTP_200_OK,
         )
@@ -115,27 +111,25 @@ def kakao_callback(request):
         #redirect_url = f"{FRONTEND_URL}/login?access={access_token}&refresh={refresh_token}"
         #return HttpResponseRedirect(redirect_url)
     
+    # 유저 정보가 없으면 회원가입 후 로그인하기
     except User.DoesNotExist:
         user = User.objects.create_user(email=user_email,nickname=user_nickname)
         user.save()
 
+        # 유저 생성할 때 냉장고 자동으로 생성하기
         fridge, created = Fridge.objects.get_or_create(user=user)
         Fridge.save()
 
-        user_serializer = UserSerializer(user)
-
+        # 토큰 발급하기
         token = TokenObtainPairSerializer.get_token(user)
         refresh_token = str(token)
         access_token = str(token.access_token)
+
         res = JsonResponse(
             {
-                "user": user_serializer.data,
-                "message": "register successs",
-                "uid":user.pk,
-                "token": {
-                    "access": access_token,
-                    "refresh": refresh_token,
-                },
+                "user_id":user.pk,
+                "access_token": access_token,
+                "refresh_token": refresh_token,
             },
             status=status.HTTP_200_OK,
         )
