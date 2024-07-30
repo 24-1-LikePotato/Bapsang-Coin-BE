@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from .models import Fridge, FridgeIngredient, Ingredient
+from .models import Fridge, FridgeIngredient, Ingredient,Recipe, Ingredient
 
 class FridgeIngredientSerializer(serializers.ModelSerializer):
+    fridge_ingredient_id = serializers.IntegerField(source='id', read_only=True)
     ingredient_name = serializers.SerializerMethodField()
     ingredient_pk = serializers.SerializerMethodField()
     days_until_expiration = serializers.SerializerMethodField()
@@ -9,7 +10,7 @@ class FridgeIngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FridgeIngredient
-        fields = ['ingredient_name','ingredient_pk', 'days_until_expiration', 'is_expiring_soon']
+        fields = ['fridge_ingredient_id','ingredient_name','ingredient_pk', 'days_until_expiration', 'is_expiring_soon']
 
     def get_ingredient_name(self, obj):
         return obj.ingredient.name
@@ -34,3 +35,13 @@ class FridgeSerializer(serializers.ModelSerializer):
     def get_ingredients(self, obj):
         fridge_ingredients = FridgeIngredient.objects.filter(fridge=obj)
         return FridgeIngredientSerializer(fridge_ingredients, many=True).data
+
+class RecipeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = '__all__'
+
+class IngredientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = '__all__'
