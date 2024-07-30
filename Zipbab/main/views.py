@@ -5,11 +5,11 @@ from django.shortcuts import get_object_or_404
 from .models import Fridge,FridgeIngredient,User
 from .serializers import FridgeIngredientCreateSerializer
 from .models import Fridge,FridgeIngredient,User,Recipe,Ingredient, RecipeIngredient
-from .serializers import FridgeSerializer,RecipeSerializer
-
+from .serializers import FridgeSerializer,RecipeSerializer, TodayRecipeSerializer
 import os
 import environ
 import requests
+import random
 from django.conf import settings
 
 
@@ -98,6 +98,14 @@ class RecipeStoreView(APIView):
 
         return Response({"status": "success"}, status=status.HTTP_200_OK)
 
+class TodayRecipeView(APIView):
+    serializer_class = RecipeSerializer
+
+    def get(self, request):
+        recipes = list(Recipe.objects.all())
+        selected_items = random.sample(recipes, 5)
+        serialized_data = TodayRecipeSerializer(selected_items, many=True).data
+        return Response(serialized_data, status=status.HTTP_200_OK)
 
 class RecipeIngredientStoreView(APIView):
     def post(self, request):
@@ -117,5 +125,3 @@ class RecipeIngredientStoreView(APIView):
                     RecipeIngredient.objects.create(recipe=recipe, ingredient=ingredient)
 
         return Response({"message": "All recipe ingredients updated successfully."}, status=status.HTTP_200_OK)
-
-

@@ -78,3 +78,9 @@ class FridgeIngredientCreateSerializer(serializers.Serializer):
             'ingredient_name': instance['ingredient_name'],
             'expiration_date': instance['expiration_date']
         }
+      
+class TodayRecipeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ['name', 'image']
+
