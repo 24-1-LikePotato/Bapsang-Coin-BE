@@ -1,6 +1,7 @@
 from pathlib import Path
 from datetime import timedelta
 import json
+from django.core.exceptions import ImproperlyConfigured
 import os
 from django.core.exceptions import ImproperlyConfigured
 

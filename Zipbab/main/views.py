@@ -2,17 +2,43 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view
 from .models import Ingredient, Recipe,Fridge,FridgeIngredient,User, RecipeIngredient
 from price.models import ChangePriceDay,ChangePriceMonth2
 from rest_framework.decorators import api_view  
-from price.models import ChangePriceDay
 from .serializers import IngredientSerializer,ChangePriceDaySerializer,RecipeSerializer,FridgeSerializer, TodayRecipeSerializer,ChangePriceMonthSerializer,FridgeIngredientCreateSerializer
-from rest_framework.decorators import api_view
 import os
 import environ
 import requests
 import random
 from django.conf import settings
+
+    
+
+
+
+class RecipeSearchView(APIView):
+    def get(self, request):
+        ingredient = request.GET.get('ingredient', None)
+        print(ingredient)
+        ingredients = Ingredient.objects.filter(name__icontains=ingredient)
+        if ingredients.exists():
+            ingredient_ids = ingredients.values_list('id', flat=True)
+            recipe_ingredients = RecipeIngredient.objects.filter(ingredient__id__in=ingredient_ids)
+            recipe_ids = recipe_ingredients.values_list('recipe_id')
+            recipes = Recipe.objects.filter(id__in=recipe_ids)
+            serializer = TodayRecipeSerializer(recipes, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "No related recipes found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+    
+
+
+    
+
 
 
 

@@ -1,9 +1,13 @@
 from django.contrib import admin
 from django.urls import path
-from .views import FridgeDetailView, RecipeStoreView, RecipeIngredientStoreView,TodayRecipeView,MonthSearchView
+from .views import FridgeDetailView, RecipeStoreView, RecipeIngredientStoreView,TodayRecipeView,RecipeSearchView,MonthSearchView
 from . import views
 
+
+
+
 urlpatterns = [
+    path('recipe/search',RecipeSearchView.as_view() , name='recipe-search'),
     path('search/', MonthSearchView.as_view(), name='ingredient-search'),
     path('related_recipe/', views.related_recipe, name='related-recipe'),
     path('search/', MonthSearchView.as_view(), name='ingredient-search'),

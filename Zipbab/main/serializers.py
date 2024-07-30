@@ -1,9 +1,6 @@
-from .models import Ingredient,Recipe
 from price.models import ChangePriceDay, ChangePriceMonth2
 from rest_framework import serializers
-from rest_framework import serializers
-from .models import Fridge, FridgeIngredient, Ingredient,Recipe, Ingredient
-from .models import Fridge, FridgeIngredient, Ingredient
+from .models import Fridge, FridgeIngredient, Ingredient,Recipe
 from django.utils import timezone
 from datetime import date
 
