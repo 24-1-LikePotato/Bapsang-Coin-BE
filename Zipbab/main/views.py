@@ -44,9 +44,11 @@ class FridgeDetailView(APIView):
         serializer = FridgeIngredientCreateSerializer(data=request.data, context={'fridge': fridge})
         
         if serializer.is_valid():
-            serializer.save()
-            return Response({'message': '정상적으로 식재료가 등록되었습니다.'}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            fridge_ingredient = serializer.save()
+            return Response({
+                'message': '정상적으로 식재료가 등록되었습니다.',
+                'data': serializer.to_representation(fridge_ingredient)
+            }, status=status.HTTP_201_CREATED)
     
     
     def delete(self, request, user_id):
