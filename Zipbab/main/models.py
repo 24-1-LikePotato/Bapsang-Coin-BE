@@ -28,9 +28,9 @@ class FridgeIngredient(models.Model):
 
 class Recipe(models.Model):
     name = models.CharField(max_length=30) # 메뉴명
-    content = models.TextField() # 
+    content = models.TextField() # 만드는 법
     ingredient_list = models.TextField()  # 기존 ingredient 필드명 변경
-    image = models.ImageField(upload_to='images/', blank=True, null=True)
+    image = models.URLField(max_length=200, blank = True, null=True)  # ImageField에서 URLField로 변경
     calorie = models.FloatField() # 열량
     carb = models.FloatField() # 탄수화물
     protein = models.FloatField() # 단백질

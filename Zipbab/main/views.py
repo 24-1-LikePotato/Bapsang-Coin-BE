@@ -2,11 +2,12 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import RecipeSerializer
+from .serializers import RecipeSerializer, TodayRecipeSerializer
 from .models import Recipe
 import os
 import environ
 import requests
+import random
 from django.conf import settings
 
 # 환경변수를 불러올 수 있는 상태로 설정
@@ -57,3 +58,13 @@ class RecipeStoreView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"status": "success"}, status=status.HTTP_200_OK)
+
+
+class TodayRecipeView(APIView):
+    serializer_class = RecipeSerializer
+
+    def get(self, request):
+        recipes = list(Recipe.objects.all())
+        selected_items = random.sample(recipes, 5)
+        serialized_data = TodayRecipeSerializer(selected_items, many=True).data
+        return Response(serialized_data, status=status.HTTP_200_OK)
