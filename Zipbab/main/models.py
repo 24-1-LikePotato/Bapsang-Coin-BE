@@ -35,20 +35,26 @@ class FridgeIngredient(models.Model):
     def is_expiring_soon(self, threshold=1):
         return self.days_until_expiration() <= threshold
     
-    
 
 
 class Recipe(models.Model):
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    name = models.CharField(max_length=30)
-    content = models.TextField()
+    name = models.CharField(max_length=30) # 메뉴명
+    content = models.TextField() # 
     ingredient_list = models.TextField()  # 기존 ingredient 필드명 변경
     image = models.ImageField(upload_to='images/', blank=True, null=True)
-    calorie = models.FloatField()
-    carb = models.FloatField()
-    protein = models.FloatField()
-    fat = models.FloatField()
-    natrium = models.FloatField()
+    calorie = models.FloatField() # 열량
+    carb = models.FloatField() # 탄수화물
+    protein = models.FloatField() # 단백질
+    fat = models.FloatField() # 지방
+    natrium = models.FloatField() # 나트륨
 
     def __str__(self) -> str:
-        return f"[ {self.ingredient.name} ] : {self.name}"
+        return self.name
+    
+
+class RecipeIngredient(models.Model):
+    ingredient = models.ForeignKey(Ingredient,on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f"{self.recipe.name}의 {self.ingredient.name}"
