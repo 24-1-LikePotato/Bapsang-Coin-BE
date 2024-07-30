@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import ChangePriceDay
-from .serializers import ChangePriceDaySerializer
+from .serializers import ChangePriceDaySerializer, TodayIngredient
 from main.models import Ingredient
 from main.serializers import IngredientSerializer
 from datetime import datetime
@@ -94,3 +94,25 @@ class UpdateIngredientPriceView(APIView):
             print(f"ChangePriceDay saved: {change_price_day}")  # 디버깅 로그
 
         return Response({"status": "success"}, status=status.HTTP_200_OK)
+
+
+class TodayPriceView(APIView):
+    def get(self, request):
+        # 전체 ChangePriceDay 객체를 읽음
+        change_price_days = ChangePriceDay.objects.all()
+        
+        if not change_price_days.exists():
+            return Response({"error": "No data available"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # 가격이 오른 것 중에 등락율이 제일 높은 것
+        highest_up_item = change_price_days.filter(updown=0).order_by('-updown_percent').first()
+        # 가격이 내려간 것 중에 등락율이 제일 낮은 것
+        lowest_down_item = change_price_days.filter(updown=1).order_by('-updown_percent').first()
+        
+        highest_price_data = TodayIngredient(highest_up_item).data
+        lowest_price_data = TodayIngredient(lowest_down_item).data
+        
+        return Response({
+            "highest_price_item": highest_price_data,
+            "lowest_price_item": lowest_price_data
+        }, status=status.HTTP_200_OK)
