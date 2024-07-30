@@ -17,6 +17,13 @@ from django.conf import settings
 
 
 
+
+@api_view(['GET'])
+def recipe(request):
+    recipe = Recipe.objects.all()
+    serializer = RecipeSerializer(recipe, many=True)
+    return Response(serializer.data)
+
 class RecipeSearchView(APIView):
     def get(self, request):
         ingredient = request.GET.get('ingredient', None)

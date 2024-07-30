@@ -3,10 +3,8 @@ from django.urls import path
 from .views import FridgeDetailView, RecipeStoreView, RecipeIngredientStoreView,TodayRecipeView,RecipeSearchView,MonthSearchView
 from . import views
 
-
-
-
 urlpatterns = [
+    path('recipe/', views.recipe, name='recipe-info'),
     path('recipe/search',RecipeSearchView.as_view() , name='recipe-search'),
     path('search/', MonthSearchView.as_view(), name='ingredient-search'),
     path('related_recipe/', views.related_recipe, name='related-recipe'),
