@@ -1,9 +1,11 @@
 from pathlib import Path
 from datetime import timedelta
 import json
+import os
 from django.core.exceptions import ImproperlyConfigured
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+CSV_FILE_PATH = BASE_DIR / 'data' / 'ingredients.csv'
 
 # secrets.json 파일에서 시크릿 키 값 로드하기
 secret_file = BASE_DIR / 'secrets.json'
@@ -36,10 +38,12 @@ INSTALLED_APPS = [
     'price',
     'account',
     'util',
+    'api',
 
     # third-party
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 
     # basic - django
     'django.contrib.admin',
