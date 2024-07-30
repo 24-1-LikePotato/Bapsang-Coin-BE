@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ChangePriceDay, ChangePriceMonth
+from .models import ChangePriceDay, ChangePriceMonth2
 from main.models import Ingredient
 
 class ChangePriceDaySerializer(serializers.ModelSerializer):
@@ -9,7 +9,7 @@ class ChangePriceDaySerializer(serializers.ModelSerializer):
 
 class ChangePriceMonthSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ChangePriceMonth
+        model = ChangePriceMonth2
         fields = '__all__'
 
 class TodayIngredientSerializer(serializers.ModelSerializer):
