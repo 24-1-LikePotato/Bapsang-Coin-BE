@@ -2,6 +2,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from .models import Fridge,FridgeIngredient,User
+from .serializers import FridgeIngredientCreateSerializer
 from .models import Fridge,FridgeIngredient,User,Recipe,Ingredient, RecipeIngredient
 from .serializers import FridgeSerializer,RecipeSerializer
 
@@ -30,6 +32,22 @@ class FridgeDetailView(APIView):
         fridge_ingredient.delete()
         return Response({'message': '식재료가 정상적으로 삭제되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
 
+    def post(self, request, user_id):
+        
+        # 등록된 유저가 없다면?
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response({'message': '등록된 유저가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        fridge = get_object_or_404(Fridge, user=user)
+
+        serializer = FridgeIngredientCreateSerializer(data=request.data, context={'fridge': fridge})
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': '정상적으로 식재료가 등록되었습니다.'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 환경변수를 불러올 수 있는 상태로 설정
 env = environ.Env(DEBUG=(bool, True))
