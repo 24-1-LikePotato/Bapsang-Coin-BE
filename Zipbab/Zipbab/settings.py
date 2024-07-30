@@ -3,8 +3,10 @@ from datetime import timedelta
 import json
 from django.core.exceptions import ImproperlyConfigured
 import os
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 CSV_FILE_PATH = BASE_DIR / 'data' / 'ingredients.csv'
 
@@ -39,13 +41,10 @@ INSTALLED_APPS = [
     'price',
     'account',
     'util',
-    'api',
 
     # third-party
     'rest_framework',
     'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
-    'drf_yasg',
 
     # basic - django
     'django.contrib.admin',
