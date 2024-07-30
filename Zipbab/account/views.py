@@ -123,7 +123,7 @@ def kakao_callback(request):
 
         # 유저 생성할 때 냉장고 자동으로 생성하기
         fridge, created = Fridge.objects.get_or_create(user=user)
-        Fridge.save()
+        fridge.save()
 
         # 토큰 발급하기
         token = TokenObtainPairSerializer.get_token(user)
