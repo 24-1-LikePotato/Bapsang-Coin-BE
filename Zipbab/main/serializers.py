@@ -56,12 +56,6 @@ class ChangePriceDaySerializer(serializers.ModelSerializer):
         model = ChangePriceDay
         fields = ['ingredient', 'price', 'updown_percent']
  
-class RecipeSerializer(serializers.ModelSerializer):
-    ingredient = IngredientSerializer()
-    
-    class Meta:
-        model = Recipe
-        fields = ['ingredient','name','content','ingredient_list','image','calorie','carb','protein','fat','natrium']
 
 class ChangePriceMonthSerializer(serializers.ModelSerializer):
     ingredient = IngredientSerializer()

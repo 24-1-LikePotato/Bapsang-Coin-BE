@@ -14,165 +14,24 @@ import random
 from django.conf import settings
 
     
-
-
-
-
-@api_view(['GET'])
-def recipe(request):
-    recipe = Recipe.objects.all()
-    serializer = RecipeSerializer(recipe, many=True)
-    return Response(serializer.data)
-
-class RecipeSearchView(APIView):
-    def get(self, request):
-        ingredient = request.GET.get('ingredient', None)
-        print(ingredient)
-        ingredients = Ingredient.objects.filter(name__icontains=ingredient)
-        if ingredients.exists():
-            ingredient_ids = ingredients.values_list('id', flat=True)
-            recipe_ingredients = RecipeIngredient.objects.filter(ingredient__id__in=ingredient_ids)
-            recipe_ids = recipe_ingredients.values_list('recipe_id')
-            recipes = Recipe.objects.filter(id__in=recipe_ids)
-            serializer = TodayRecipeSerializer(recipes, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"error": "No related recipes found"}, status=status.HTTP_404_NOT_FOUND)
-
-
-
-    
-
-
-    
-
-
-
-
-# Create your views here.
-
-
-
-    
-
-
-    
-
 env = environ.Env(DEBUG=(bool, True))
 
 environ.Env.read_env(
   env_file=os.path.join(settings.BASE_DIR, '.env')
 )
 
-        
-
-
-class MonthSearchView(APIView):
-    def get(self, request):
-        ingredient = request.GET.get('ingredient', None)
-        if ingredient:
-            ingredients = Ingredient.objects.filter(name__icontains=ingredient).first()
-            ingredient_ids = ingredients.id
-
-            dayprice = ChangePriceDay.objects.filter(ingredient__id=ingredient_ids).first()
-            monthprice = ChangePriceMonth2.objects.filter(ingredient__id=ingredient_ids).first()
-            ingredient1 = get_object_or_404(Ingredient, name = dayprice.ingredient.name)
-            ingredient_api_key = env('INGREDIENT_API_KEY')
-            ingredient_api_id = env('INGREDIENT_API_ID')
-            ingredient_product_code = ingredient1.code
-            url = f'http://www.kamis.or.kr/service/price/xml.do?action=recentlyPriceTrendList&p_productno={ingredient_product_code}&p_cert_key={ingredient_api_key}&p_cert_id={ingredient_api_id}&p_returntype=json'
-
-            try:
-
-                # 가격 데이터 추출
-                response = requests.get(url)
-                response.raise_for_status()  # Check if the request was successful
-                forty = int(response.json()['price'][0]['d40']) # 레시피 관련 부분만 가지고 옴
-                thirty = int(response.json()['price'][0]['d30'])
-                twenty = int(response.json()['price'][0]['d20'])
-                ten = int(response.json()['price'][0]['d10'])
-                today = int(response.json()['price'][0]['d0'])
-                
-                # 모델에 저장
-                ChangePriceMonth2(
-                ingredient = ingredient1,
-                forty = forty,
-                thirty = thirty,
-                twenty = twenty,
-                ten = ten,
-                today = today
-                ).save()
-
-                # 직렬화 및 응답
-                dayprice_serializer = ChangePriceDaySerializer(dayprice)
-                monthprice_serializer = ChangePriceMonthSerializer(monthprice)
-                return Response({"dayprice": dayprice_serializer.data, "monthprice": monthprice_serializer.data})
-
-            except requests.exceptions.RequestException as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
+#오늘의 식재료
 
 
 
-class FridgeDetailView(APIView):
-    def get(self, request, user_id):
 
-        # 등록된 유저가 없다면?
-        try:
-            user = User.objects.get(pk=user_id)
-        except User.DoesNotExist:
-            return Response({'message': '등록된 유저가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
-        
-        fridge = get_object_or_404(Fridge, user_id=user_id)
-        fridge_ingredients = FridgeIngredient.objects.filter(fridge=fridge)
-
-        if not fridge_ingredients.exists():
-            return Response({'message': '등록한 식재료가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = FridgeSerializer(fridge)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    def post(self, request, user_id):
-        
-        # 등록된 유저가 없다면?
-        try:
-            user = User.objects.get(pk=user_id)
-        except User.DoesNotExist:
-            return Response({'message': '등록된 유저가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
-        
-        fridge = get_object_or_404(Fridge, user=user)
-
-        serializer = FridgeIngredientCreateSerializer(data=request.data, context={'fridge': fridge})
-        
-        if serializer.is_valid():
-            fridge_ingredient = serializer.save()
-            return Response({
-                'message': '정상적으로 식재료가 등록되었습니다.',
-                'data': serializer.to_representation(fridge_ingredient)
-            }, status=status.HTTP_201_CREATED)
-    
-    
-    def delete(self, request, user_id):
-        fridge_ingredient_id = request.data.get('fridge_ingredient_id')
-
-        if not fridge_ingredient_id:
-            return Response({'message': 'fridge_ingredient_id가 제공되지 않았습니다.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # BODY로 받은 fridge_ingredient_id로 객체 찾기
-        try:
-            fridge_ingredient = FridgeIngredient.objects.get(pk=fridge_ingredient_id)
-        
-        except FridgeIngredient.DoesNotExist:
-            return Response({'message': '해당 fridge_ingredient가 존재하지 않거나 유효하지 않습니다.'}, status=status.HTTP_404_NOT_FOUND)
-        
-        # Delete the fridge ingredient
-        fridge_ingredient.delete()
-        return Response({'message': '식재료가 정상적으로 삭제되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
-
-    
+#추천 식재료 
 
 
+
+
+
+#오늘의 집밥
 class RecipeStoreView(APIView):
     serializer_class = RecipeSerializer
     recipe_api_key = env('RECIPE_API_KEY')
@@ -241,6 +100,80 @@ class RecipeIngredientStoreView(APIView):
                     RecipeIngredient.objects.create(recipe=recipe, ingredient=ingredient)
 
         return Response({"message": "All recipe ingredients updated successfully."}, status=status.HTTP_200_OK)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#식재료기본페이지
+class MonthStoreView(APIView):
+    dayprice = ChangePriceDay.objects.order_by('price').first()
+    ingredient = get_object_or_404(Ingredient, name = dayprice.ingredient.name)
+    ingredient_api_key = env('INGREDIENT_API_KEY')
+    ingredient_api_id = env('INGREDIENT_API_ID')
+    ingredient_product_code = ingredient.code
+    def get(self, request):
+        url = f'http://www.kamis.or.kr/service/price/xml.do?action=recentlyPriceTrendList&p_productno={self.ingredient_product_code}&p_cert_key={self.ingredient_api_key}&p_cert_id={self.ingredient_api_id}&p_returntype=json'
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Check if the request was successful
+            forty = int(response.json()['price'][0]['d40']) # 레시피 관련 부분만 가지고 옴
+            thirty = int(response.json()['price'][0]['d30'])
+            twenty = int(response.json()['price'][0]['d20'])
+            ten = int(response.json()['price'][0]['d10'])
+            today = int(response.json()['price'][0]['d0'])
+        
+            # 모델에 저장
+            ChangePriceMonth2(
+                ingredient = self.ingredient,
+                forty = forty,
+                thirty = thirty,
+                twenty = twenty,
+                ten = ten,
+                today = today
+            ).save()
+            dayprice = ChangePriceDay.objects.order_by('price').first()
+            monthprice = ChangePriceMonth2.objects.order_by('today').first()
+            dayprice_serializer = ChangePriceDaySerializer(dayprice)
+            monthprice_serializer = ChangePriceMonthSerializer(monthprice)
+            return Response({"dayprice": dayprice_serializer.data, "monthprice" : monthprice_serializer.data})
+
+
+        except requests.exceptions.RequestException as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"status": "success"}, status=status.HTTP_200_OK)
+
+#레시피 기본페이지
 @api_view(['GET'])
 def related_recipe(request):
     changeprice = ChangePriceDay.objects.order_by('price').first()
@@ -255,3 +188,134 @@ def related_recipe(request):
         else:
             return Response({"error": "No related recipes found"}, status=status.HTTP_404_NOT_FOUND)
     return Response({"error": "No price data available"}, status=status.HTTP_404_NOT_FOUND)
+        
+
+#식재료 검색페이지
+class MonthSearchView(APIView):
+    def get(self, request):
+        ingredient = request.GET.get('ingredient', None)
+        if ingredient:
+            ingredients = Ingredient.objects.filter(name__icontains=ingredient).first()
+            ingredient_ids = ingredients.id
+
+            dayprice = ChangePriceDay.objects.filter(ingredient__id=ingredient_ids).first()
+            monthprice = ChangePriceMonth2.objects.filter(ingredient__id=ingredient_ids).first()
+            ingredient1 = get_object_or_404(Ingredient, name = dayprice.ingredient.name)
+            ingredient_api_key = env('INGREDIENT_API_KEY')
+            ingredient_api_id = env('INGREDIENT_API_ID')
+            ingredient_product_code = ingredient1.code
+            url = f'http://www.kamis.or.kr/service/price/xml.do?action=recentlyPriceTrendList&p_productno={ingredient_product_code}&p_cert_key={ingredient_api_key}&p_cert_id={ingredient_api_id}&p_returntype=json'
+
+            try:
+
+                # 가격 데이터 추출
+                response = requests.get(url)
+                response.raise_for_status()  # Check if the request was successful
+                forty = int(response.json()['price'][0]['d40']) # 레시피 관련 부분만 가지고 옴
+                thirty = int(response.json()['price'][0]['d30'])
+                twenty = int(response.json()['price'][0]['d20'])
+                ten = int(response.json()['price'][0]['d10'])
+                today = int(response.json()['price'][0]['d0'])
+                
+                # 모델에 저장
+                ChangePriceMonth2(
+                ingredient = ingredient1,
+                forty = forty,
+                thirty = thirty,
+                twenty = twenty,
+                ten = ten,
+                today = today
+                ).save()
+
+                # 직렬화 및 응답
+                dayprice_serializer = ChangePriceDaySerializer(dayprice)
+                monthprice_serializer = ChangePriceMonthSerializer(monthprice)
+                return Response({"dayprice": dayprice_serializer.data, "monthprice": monthprice_serializer.data})
+
+            except requests.exceptions.RequestException as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
+
+#레시피 검색
+class RecipeSearchView(APIView):
+    def get(self, request):
+        ingredient = request.GET.get('ingredient', None)
+        print(ingredient)
+        ingredients = Ingredient.objects.filter(name__icontains=ingredient)
+        if ingredients.exists():
+            ingredient_ids = ingredients.values_list('id', flat=True)
+            recipe_ingredients = RecipeIngredient.objects.filter(ingredient__id__in=ingredient_ids)
+            recipe_ids = recipe_ingredients.values_list('recipe_id')
+            recipes = Recipe.objects.filter(id__in=recipe_ids)
+            serializer = TodayRecipeSerializer(recipes, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "No related recipes found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+#냉장고 기능 
+class FridgeDetailView(APIView):
+    def get(self, request, user_id):
+
+        # 등록된 유저가 없다면?
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response({'message': '등록된 유저가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        fridge = get_object_or_404(Fridge, user_id=user_id)
+        fridge_ingredients = FridgeIngredient.objects.filter(fridge=fridge)
+
+        if not fridge_ingredients.exists():
+            return Response({'message': '등록한 식재료가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = FridgeSerializer(fridge)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    def post(self, request, user_id):
+        
+        # 등록된 유저가 없다면?
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response({'message': '등록된 유저가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        fridge = get_object_or_404(Fridge, user=user)
+
+        serializer = FridgeIngredientCreateSerializer(data=request.data, context={'fridge': fridge})
+        
+        if serializer.is_valid():
+            fridge_ingredient = serializer.save()
+            return Response({
+                'message': '정상적으로 식재료가 등록되었습니다.',
+                'data': serializer.to_representation(fridge_ingredient)
+            }, status=status.HTTP_201_CREATED)
+    
+    
+    def delete(self, request, user_id):
+        fridge_ingredient_id = request.data.get('fridge_ingredient_id')
+
+        if not fridge_ingredient_id:
+            return Response({'message': 'fridge_ingredient_id가 제공되지 않았습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # BODY로 받은 fridge_ingredient_id로 객체 찾기
+        try:
+            fridge_ingredient = FridgeIngredient.objects.get(pk=fridge_ingredient_id)
+        
+        except FridgeIngredient.DoesNotExist:
+            return Response({'message': '해당 fridge_ingredient가 존재하지 않거나 유효하지 않습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Delete the fridge ingredient
+        fridge_ingredient.delete()
+        return Response({'message': '식재료가 정상적으로 삭제되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
+
+    
+
+
+#레시피 보여주기
+@api_view(['GET'])
+def recipe(request):
+    recipe = Recipe.objects.all()
+    serializer = RecipeSerializer(recipe, many=True)
+    return Response(serializer.data)
