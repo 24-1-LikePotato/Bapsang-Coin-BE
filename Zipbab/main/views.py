@@ -2,43 +2,84 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from .models import Ingredient, Recipe
+from .models import Ingredient, Recipe,Fridge,FridgeIngredient,User, RecipeIngredient
+from price.models import ChangePriceDay,ChangePriceMonth2
+from rest_framework.decorators import api_view  
 from price.models import ChangePriceDay
-from .serializers import IngredientSerializer,ChangePriceDaySerializer,RecipeSerializer
+from .serializers import IngredientSerializer,ChangePriceDaySerializer,RecipeSerializer,FridgeSerializer, TodayRecipeSerializer,ChangePriceMonthSerializer,FridgeIngredientCreateSerializer
 from rest_framework.decorators import api_view
 import os
 import environ
 import requests
 import random
 from django.conf import settings
-from .models import Fridge,FridgeIngredient,User
-from .serializers import FridgeIngredientCreateSerializer
-from .models import Fridge,FridgeIngredient,User,Recipe,Ingredient, RecipeIngredient
-from .serializers import FridgeSerializer,RecipeSerializer, TodayRecipeSerializer
+
+
 
 # Create your views here.
 
 
 
-@api_view(['GET'])
-def related_recipe(request):
-    changeprice = ChangePriceDay.objects.order_by('price').first()
-    if changeprice:
-        ingredient = changeprice.ingredient
-        recipe_ingredients = RecipeIngredient.objects.filter(ingredient=ingredient)
-
-        if recipe_ingredients.exists():
-            recipes = Recipe.objects.filter(id__in=recipe_ingredients.values_list('recipe_id', flat=True))
-            serializer = TodayRecipeSerializer(recipes, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"error": "No related recipes found"}, status=status.HTTP_404_NOT_FOUND)
-    return Response({"error": "No price data available"}, status=status.HTTP_404_NOT_FOUND)
-
     
 
 
     
+
+env = environ.Env(DEBUG=(bool, True))
+
+environ.Env.read_env(
+  env_file=os.path.join(settings.BASE_DIR, '.env')
+)
+
+        
+
+
+class MonthSearchView(APIView):
+    def get(self, request):
+        ingredient = request.GET.get('ingredient', None)
+        if ingredient:
+            ingredients = Ingredient.objects.filter(name__icontains=ingredient).first()
+            ingredient_ids = ingredients.id
+
+            dayprice = ChangePriceDay.objects.filter(ingredient__id=ingredient_ids).first()
+            monthprice = ChangePriceMonth2.objects.filter(ingredient__id=ingredient_ids).first()
+            ingredient1 = get_object_or_404(Ingredient, name = dayprice.ingredient.name)
+            ingredient_api_key = env('INGREDIENT_API_KEY')
+            ingredient_api_id = env('INGREDIENT_API_ID')
+            ingredient_product_code = ingredient1.code
+            url = f'http://www.kamis.or.kr/service/price/xml.do?action=recentlyPriceTrendList&p_productno={ingredient_product_code}&p_cert_key={ingredient_api_key}&p_cert_id={ingredient_api_id}&p_returntype=json'
+
+            try:
+
+                # 가격 데이터 추출
+                response = requests.get(url)
+                response.raise_for_status()  # Check if the request was successful
+                forty = int(response.json()['price'][0]['d40']) # 레시피 관련 부분만 가지고 옴
+                thirty = int(response.json()['price'][0]['d30'])
+                twenty = int(response.json()['price'][0]['d20'])
+                ten = int(response.json()['price'][0]['d10'])
+                today = int(response.json()['price'][0]['d0'])
+                
+                # 모델에 저장
+                ChangePriceMonth2(
+                ingredient = ingredient1,
+                forty = forty,
+                thirty = thirty,
+                twenty = twenty,
+                ten = ten,
+                today = today
+                ).save()
+
+                # 직렬화 및 응답
+                dayprice_serializer = ChangePriceDaySerializer(dayprice)
+                monthprice_serializer = ChangePriceMonthSerializer(monthprice)
+                return Response({"dayprice": dayprice_serializer.data, "monthprice": monthprice_serializer.data})
+
+            except requests.exceptions.RequestException as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class FridgeDetailView(APIView):
@@ -98,13 +139,6 @@ class FridgeDetailView(APIView):
 
     
 
-# 환경변수를 불러올 수 있는 상태로 설정
-env = environ.Env(DEBUG=(bool, True))
-
-# 읽어올 환경 변수 파일을 지정
-environ.Env.read_env(
-  env_file=os.path.join(settings.BASE_DIR, '.env')
-)
 
 class RecipeStoreView(APIView):
     serializer_class = RecipeSerializer
