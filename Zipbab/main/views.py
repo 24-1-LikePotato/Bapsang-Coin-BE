@@ -2,6 +2,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from .models import Fridge,FridgeIngredient,User
+from .serializers import FridgeIngredientCreateSerializer
 from .models import Fridge,FridgeIngredient,User,Recipe,Ingredient, RecipeIngredient
 from .serializers import FridgeSerializer,RecipeSerializer
 
@@ -10,8 +12,6 @@ import environ
 import requests
 from django.conf import settings
 
-from .models import Fridge,FridgeIngredient,User
-from .serializers import FridgeIngredientCreateSerializer
 
 class FridgeDetailView(APIView):
     def post(self, request, user_id):
@@ -22,18 +22,14 @@ class FridgeDetailView(APIView):
         except User.DoesNotExist:
             return Response({'message': '등록된 유저가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
         
-        fridge = get_object_or_404(Fridge, user_id=user_id)
-        fridge_ingredients = FridgeIngredient.objects.filter(fridge=fridge)
+        fridge = get_object_or_404(Fridge, user=user)
 
-        if not fridge_ingredients.exists():
-            return Response({'message': '등록한 식재료가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = FridgeIngredientCreateSerializer(data=request.data, context={'fridge': fridge})
         
-        serializer = FridgeSerializer(fridge)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    
-
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': '정상적으로 식재료가 등록되었습니다.'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 환경변수를 불러올 수 있는 상태로 설정
 env = environ.Env(DEBUG=(bool, True))
@@ -105,12 +101,3 @@ class RecipeIngredientStoreView(APIView):
         return Response({"message": "All recipe ingredients updated successfully."}, status=status.HTTP_200_OK)
 
 
-
-        fridge = get_object_or_404(Fridge, user=user)
-
-        serializer = FridgeIngredientCreateSerializer(data=request.data, context={'fridge': fridge})
-        
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'message': '정상적으로 식재료가 등록되었습니다.'}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
