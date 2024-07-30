@@ -2,6 +2,8 @@ from pathlib import Path
 from datetime import timedelta
 import json
 from django.core.exceptions import ImproperlyConfigured
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 CSV_FILE_PATH = BASE_DIR / 'data' / 'ingredients.csv'
@@ -104,8 +106,8 @@ AUTH_USER_MODEL = 'account.User' # 커스텀 유저를 장고에서 사용하기
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',  # 인증된 요청인지 확인
-        #'rest_framework.permissions.AllowAny',  # 누구나 접근 가능 
+        #'rest_framework.permissions.IsAuthenticated',  # 인증된 요청인지 확인
+        'rest_framework.permissions.AllowAny',  # 누구나 접근 가능 
 				# (기본적으로 누구나 접근 가능하게 설정하고, 인증된 요청인지 확인하는 api를 따로 지정하게 하려면 
 				# 이 옵션을 위의 옵션 대신 켜주어도 됩니다!)
     ),
