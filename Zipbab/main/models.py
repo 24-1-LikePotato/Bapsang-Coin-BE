@@ -36,7 +36,6 @@ class FridgeIngredient(models.Model):
         return self.days_until_expiration() <= threshold
     
 
-
 class Recipe(models.Model):
     name = models.CharField(max_length=30) # 메뉴명
     content = models.TextField() # 

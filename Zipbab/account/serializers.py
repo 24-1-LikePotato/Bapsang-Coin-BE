@@ -10,3 +10,9 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
         instance.is_subscribe = True  
         instance.save()
         return instance
+    
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'nickname']  # 필요한 필드를 나열합니다.
