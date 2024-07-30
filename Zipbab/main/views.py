@@ -117,12 +117,10 @@ class MonthSearchView(APIView):
         if ingredient:
             ingredients = Ingredient.objects.filter(name__icontains=ingredient).first()
             ingredient_ids = ingredients.id
-            
-            # ChangePriceDay와 ChangePriceMonth2 객체 찾기
+
             dayprice = ChangePriceDay.objects.filter(ingredient__id=ingredient_ids).first()
             monthprice = ChangePriceMonth2.objects.filter(ingredient__id=ingredient_ids).first()
             ingredient1 = get_object_or_404(Ingredient, name = dayprice.ingredient.name)
-            # Ingredients 객체를 가져
             ingredient_api_key = env('INGREDIENT_API_KEY')
             ingredient_api_id = env('INGREDIENT_API_ID')
             ingredient_product_code = ingredient1.code
