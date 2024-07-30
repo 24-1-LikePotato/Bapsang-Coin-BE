@@ -31,6 +31,25 @@ class FridgeDetailView(APIView):
         serializer = FridgeSerializer(fridge)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+    def post(self, request, user_id):
+        
+        # 등록된 유저가 없다면?
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response({'message': '등록된 유저가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        fridge = get_object_or_404(Fridge, user=user)
+
+        serializer = FridgeIngredientCreateSerializer(data=request.data, context={'fridge': fridge})
+        
+        if serializer.is_valid():
+            fridge_ingredient = serializer.save()
+            return Response({
+                'message': '정상적으로 식재료가 등록되었습니다.',
+                'data': serializer.to_representation(fridge_ingredient)
+            }, status=status.HTTP_201_CREATED)
+    
     
     def delete(self, request, user_id):
         fridge_ingredient_id = request.data.get('fridge_ingredient_id')
@@ -49,22 +68,7 @@ class FridgeDetailView(APIView):
         fridge_ingredient.delete()
         return Response({'message': '식재료가 정상적으로 삭제되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
 
-    def post(self, request, user_id):
-        
-        # 등록된 유저가 없다면?
-        try:
-            user = User.objects.get(pk=user_id)
-        except User.DoesNotExist:
-            return Response({'message': '등록된 유저가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
-        
-        fridge = get_object_or_404(Fridge, user=user)
-
-        serializer = FridgeIngredientCreateSerializer(data=request.data, context={'fridge': fridge})
-        
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'message': '정상적으로 식재료가 등록되었습니다.'}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 # 환경변수를 불러올 수 있는 상태로 설정
 env = environ.Env(DEBUG=(bool, True))

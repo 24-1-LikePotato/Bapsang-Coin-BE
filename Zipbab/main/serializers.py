@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Fridge, FridgeIngredient, Ingredient,Recipe, Ingredient
 from .models import Fridge, FridgeIngredient, Ingredient
 from django.utils import timezone
+from datetime import date
 
 class FridgeIngredientSerializer(serializers.ModelSerializer):
     fridge_ingredient_id = serializers.IntegerField(source='id', read_only=True)
@@ -73,11 +74,17 @@ class FridgeIngredientCreateSerializer(serializers.Serializer):
         return validated_data
 
     def to_representation(self, instance):
-        # Directly use the validated data for representation
+        # Calculate days until expiration
+        expiration_date = instance['expiration_date']
+        current_date = date.today()
+        days_left = (expiration_date - current_date).days
+
+        # Directly use the validated data for representation with days left
         return {
             'ingredient_name': instance['ingredient_name'],
-            'expiration_date': instance['expiration_date']
+            'days_left': days_left
         }
+
       
 class TodayRecipeSerializer(serializers.ModelSerializer):
     class Meta:
