@@ -12,7 +12,7 @@ class ChangePriceMonthSerializer(serializers.ModelSerializer):
         model = ChangePriceMonth
         fields = '__all__'
 
-class TodayIngredient(serializers.ModelSerializer):
+class TodayIngredientSerializer(serializers.ModelSerializer):
     ingredient_name = serializers.CharField(source='ingredient.name')
 
     class Meta:

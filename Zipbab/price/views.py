@@ -3,12 +3,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import ChangePriceDay
-from .serializers import ChangePriceDaySerializer, TodayIngredient
+from .serializers import ChangePriceDaySerializer, TodayIngredientSerializer
 from main.models import Ingredient
 from main.serializers import IngredientSerializer
 from datetime import datetime
 import os
 import environ
+import random
 from django.conf import settings
 
 # 환경변수를 불러올 수 있는 상태로 설정
@@ -109,10 +110,39 @@ class TodayPriceView(APIView):
         # 가격이 내려간 것 중에 등락율이 제일 낮은 것
         lowest_down_item = change_price_days.filter(updown=1).order_by('-updown_percent').first()
         
-        highest_price_data = TodayIngredient(highest_up_item).data
-        lowest_price_data = TodayIngredient(lowest_down_item).data
+        highest_price_data = TodayIngredientSerializer(highest_up_item).data
+        lowest_price_data = TodayIngredientSerializer(lowest_down_item).data
         
         return Response({
             "highest_price_item": highest_price_data,
             "lowest_price_item": lowest_price_data
         }, status=status.HTTP_200_OK)
+
+
+class RandomPriceDropView(APIView):
+    def get(self, request):
+        # 하락한 식재료들 중에서 선택
+        price_down_items = list(ChangePriceDay.objects.filter(updown=1))
+        
+        if len(price_down_items) < 5: # 하락한 식재료가 5개 미만이면
+            # 전일과 비교해서 가격 변동이 없는 식재료 선택
+            no_change_items = list(ChangePriceDay.objects.filter(updown=2))
+            # 하락한 식재료와 가격 변동 없는 식재료를 합침
+            combined_items = price_down_items + no_change_items
+
+            if len(combined_items) < 5: # (하락한 식재료 + 변동 없는 식재료) 가 5개 미만이면
+                all_items = list(ChangePriceDay.objects.all())
+                selected_items = random.sample(all_items, min(5, len(all_items)))
+            else: # 총 5개가 되도록 랜덤 선택
+                selected_items = random.sample(combined_items, min(5, len(combined_items)))
+
+        else: # 하락한 식재료가 5개 이상인 경우
+            # 하락한 식재료들 중에서 랜덤하게 5개 선택
+            selected_items = random.sample(price_down_items, 5)
+        
+        # 시리얼라이저를 사용하여 데이터 변환
+        serialized_data = TodayIngredientSerializer(selected_items, many=True).data
+
+        return Response(serialized_data, status=status.HTTP_200_OK)
+
+
