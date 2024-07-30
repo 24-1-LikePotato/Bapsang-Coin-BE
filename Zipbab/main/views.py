@@ -5,15 +5,32 @@ from django.shortcuts import get_object_or_404
 from .models import Fridge,FridgeIngredient,User
 from .serializers import FridgeIngredientCreateSerializer
 from .models import Fridge,FridgeIngredient,User,Recipe,Ingredient, RecipeIngredient
-from .serializers import FridgeSerializer,RecipeSerializer
-
+from .serializers import FridgeSerializer,RecipeSerializer, TodayRecipeSerializer
 import os
 import environ
 import requests
+import random
 from django.conf import settings
 
 
 class FridgeDetailView(APIView):
+    def get(self, request, user_id):
+
+        # 등록된 유저가 없다면?
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response({'message': '등록된 유저가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        fridge = get_object_or_404(Fridge, user_id=user_id)
+        fridge_ingredients = FridgeIngredient.objects.filter(fridge=fridge)
+
+        if not fridge_ingredients.exists():
+            return Response({'message': '등록한 식재료가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = FridgeSerializer(fridge)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
     def post(self, request, user_id):
         
         # 등록된 유저가 없다면?
@@ -100,6 +117,14 @@ class RecipeStoreView(APIView):
 
         return Response({"status": "success"}, status=status.HTTP_200_OK)
 
+class TodayRecipeView(APIView):
+    serializer_class = RecipeSerializer
+
+    def get(self, request):
+        recipes = list(Recipe.objects.all())
+        selected_items = random.sample(recipes, 5)
+        serialized_data = TodayRecipeSerializer(selected_items, many=True).data
+        return Response(serialized_data, status=status.HTTP_200_OK)
 
 class RecipeIngredientStoreView(APIView):
     def post(self, request):
@@ -119,5 +144,3 @@ class RecipeIngredientStoreView(APIView):
                     RecipeIngredient.objects.create(recipe=recipe, ingredient=ingredient)
 
         return Response({"message": "All recipe ingredients updated successfully."}, status=status.HTTP_200_OK)
-
-
