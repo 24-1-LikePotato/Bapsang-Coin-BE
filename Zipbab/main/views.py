@@ -2,15 +2,43 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from .models import Fridge,FridgeIngredient,User
-from .serializers import FridgeIngredientCreateSerializer
-from .models import Fridge,FridgeIngredient,User,Recipe,Ingredient, RecipeIngredient
-from .serializers import FridgeSerializer,RecipeSerializer, TodayRecipeSerializer
+from .models import Ingredient, Recipe
+from price.models import ChangePriceDay
+from .serializers import IngredientSerializer,ChangePriceDaySerializer,RecipeSerializer
+from rest_framework.decorators import api_view
 import os
 import environ
 import requests
 import random
 from django.conf import settings
+from .models import Fridge,FridgeIngredient,User
+from .serializers import FridgeIngredientCreateSerializer
+from .models import Fridge,FridgeIngredient,User,Recipe,Ingredient, RecipeIngredient
+from .serializers import FridgeSerializer,RecipeSerializer, TodayRecipeSerializer
+
+# Create your views here.
+
+
+
+@api_view(['GET'])
+def related_recipe(request):
+    changeprice = ChangePriceDay.objects.order_by('price').first()
+    if changeprice:
+        ingredient = changeprice.ingredient
+        recipe_ingredients = RecipeIngredient.objects.filter(ingredient=ingredient)
+
+        if recipe_ingredients.exists():
+            recipes = Recipe.objects.filter(id__in=recipe_ingredients.values_list('recipe_id', flat=True))
+            serializer = TodayRecipeSerializer(recipes, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "No related recipes found"}, status=status.HTTP_404_NOT_FOUND)
+    return Response({"error": "No price data available"}, status=status.HTTP_404_NOT_FOUND)
+
+    
+
+
+    
 
 
 class FridgeDetailView(APIView):
@@ -146,3 +174,17 @@ class RecipeIngredientStoreView(APIView):
                     RecipeIngredient.objects.create(recipe=recipe, ingredient=ingredient)
 
         return Response({"message": "All recipe ingredients updated successfully."}, status=status.HTTP_200_OK)
+@api_view(['GET'])
+def related_recipe(request):
+    changeprice = ChangePriceDay.objects.order_by('price').first()
+    if changeprice:
+        ingredient = changeprice.ingredient
+        recipe_ingredients = RecipeIngredient.objects.filter(ingredient=ingredient)
+
+        if recipe_ingredients.exists():
+            recipes = Recipe.objects.filter(id__in=recipe_ingredients.values_list('recipe_id', flat=True))
+            serializer = TodayRecipeSerializer(recipes, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "No related recipes found"}, status=status.HTTP_404_NOT_FOUND)
+    return Response({"error": "No price data available"}, status=status.HTTP_404_NOT_FOUND)

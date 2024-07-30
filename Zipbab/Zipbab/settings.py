@@ -2,7 +2,7 @@ from pathlib import Path
 from datetime import timedelta
 import json
 import os
-
+from django.core.exceptions import ImproperlyConfigured
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 CSV_FILE_PATH = BASE_DIR / 'data' / 'ingredients.csv'

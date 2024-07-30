@@ -1,3 +1,6 @@
+from .models import Ingredient,Recipe
+from price.models import ChangePriceDay
+from rest_framework import serializers
 from rest_framework import serializers
 from .models import Fridge, FridgeIngredient, Ingredient,Recipe, Ingredient
 from .models import Fridge, FridgeIngredient, Ingredient
@@ -47,6 +50,20 @@ class RecipeSerializer(serializers.ModelSerializer):
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
+        fields = ['name']
+
+class ChangePriceDaySerializer(serializers.ModelSerializer):
+    ingredient = IngredientSerializer()
+
+    class Meta:
+        model = ChangePriceDay
+        fields = ['ingredient', 'price', 'updown_percent']
+ 
+class RecipeSerializer(serializers.ModelSerializer):
+    ingredient = IngredientSerializer()
+    
+    class Meta:
+        model = Recipe
         fields = '__all__'
 
 class FridgeIngredientCreateSerializer(serializers.Serializer):
@@ -90,4 +107,5 @@ class TodayRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ['name', 'image']
+
 
