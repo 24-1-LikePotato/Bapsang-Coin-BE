@@ -14,6 +14,23 @@ from django.conf import settings
 
 
 class FridgeDetailView(APIView):
+    def get(self, request, user_id):
+
+        # 등록된 유저가 없다면?
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response({'message': '등록된 유저가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        fridge = get_object_or_404(Fridge, user_id=user_id)
+        fridge_ingredients = FridgeIngredient.objects.filter(fridge=fridge)
+
+        if not fridge_ingredients.exists():
+            return Response({'message': '등록한 식재료가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = FridgeSerializer(fridge)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def delete(self, request, user_id):
         fridge_ingredient_id = request.data.get('fridge_ingredient_id')
