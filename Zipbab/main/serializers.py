@@ -1,7 +1,6 @@
 from .models import Ingredient,Recipe
 from price.models import ChangePriceDay, ChangePriceMonth2
 from rest_framework import serializers
-
 from rest_framework import serializers
 from .models import Fridge, FridgeIngredient, Ingredient,Recipe, Ingredient
 from .models import Fridge, FridgeIngredient, Ingredient
@@ -115,4 +114,5 @@ class TodayRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ['name', 'image']
+
 

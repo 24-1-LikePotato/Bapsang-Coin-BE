@@ -2,113 +2,36 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from .models import Ingredient, Recipe
+from .models import Ingredient, Recipe,Fridge,FridgeIngredient,User, RecipeIngredient
 from price.models import ChangePriceDay,ChangePriceMonth2
-from .serializers import IngredientSerializer,ChangePriceDaySerializer,RecipeSerializer,ChangePriceMonthSerializer
+from rest_framework.decorators import api_view  
+from price.models import ChangePriceDay
+from .serializers import IngredientSerializer,ChangePriceDaySerializer,RecipeSerializer,FridgeSerializer, TodayRecipeSerializer,ChangePriceMonthSerializer,FridgeIngredientCreateSerializer
 from rest_framework.decorators import api_view
-
-
-# class RecipeSearchView(APIView):
-#     def get(self, request):
-#         ingredient = request.GET.get('ingredient', None)
-#         print(ingredient)
-#         ingredients = Ingredient.objects.filter(name__icontains=ingredient)
-#         if ingredients.exists():
-#             ingredient_ids = ingredients.values_list('id', flat=True)
-#             recipe_ingredients = RecipeIngredient.objects.filter(ingredient__id__in=ingredient_ids)
-#             recipe_ids = recipe_ingredients.values_list('recipe_id')
-#             recipes = Recipe.objects.filter(id__in=recipe_ids)
-#             serializer = TodayRecipeSerializer(recipes, many=True)
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         else:
-#             return Response({"error": "No related recipes found"}, status=status.HTTP_404_NOT_FOUND)   
-
-
-
-# @api_view(['GET'])
-# def ingredientsearch(request):
-#     query = request.GET.get('query','')
-#     if query:
-#         ingredient = Ingredient.objects.filter(name__icontains=query)
-#         if ingredient.exists():
-#             dayprice = ChangePriceDay.objects.filter(ingredient=ingredient)
-#             monthprice = ChangePriceMonth2.objects.filter(ingredient=ingredient)
-#             if dayprice & monthprice:
-#                 dayprice_serializer = ChangePriceDaySerializer(dayprice, many=True)
-#                 monthprice_serializer = ChangePriceMonthSerializer(monthprice, many=True)
-#                 return Response({"dayprice": dayprice_serializer.data, "monthprice" : monthprice_serializer.data})
-#     return Response({"error": "No data found"}, status=status.HTTP_404_NOT_FOUND)
-
-
-    
-
-
-    
-
-# Create your views here.
-from .models import Fridge,FridgeIngredient,User
-from .serializers import FridgeIngredientCreateSerializer
-from .models import Fridge,FridgeIngredient,User,Recipe,Ingredient, RecipeIngredient
-from .serializers import FridgeSerializer,RecipeSerializer, TodayRecipeSerializer
 import os
 import environ
 import requests
 import random
 from django.conf import settings
 
+
+
+# Create your views here.
+
+
+
+    
+
+
+    
+
 env = environ.Env(DEBUG=(bool, True))
 
 environ.Env.read_env(
   env_file=os.path.join(settings.BASE_DIR, '.env')
 )
-# class MonthSearchView(APIView):
-#     def get(self, request):
-#         ingredient = request.GET.get('ingredient', None)
-#         if ingredient:
-#             ingredients = Ingredient.objects.filter(name__icontains=ingredient).first()
-#             ingredient_ids = ingredients.values_list('id', flat=True)
-#             dayprice = ChangePriceDay.objects.filter(ingredient__id__in=ingredient_ids).first()
-#             monthprice = ChangePriceMonth2.objects.filter(ingredient__id__in=ingredient_ids).first()
-#         ingredient = get_object_or_404(Ingredient, name = dayprice.ingredient.name)
-#         ingredient_api_key = env('INGREDIENT_API_KEY')
-#         ingredient_api_id = env('INGREDIENT_API_ID')
-#         ingredient_product_code = ingredients.code
-#         url = f'http://www.kamis.or.kr/service/price/xml.do?action=recentlyPriceTrendList&p_productno={self.ingredient_product_code}&p_cert_key={self.ingredient_api_key}&p_cert_id={self.ingredient_api_id}&p_returntype=json'
-#         try:
-#             response = requests.get(url)
-#             response.raise_for_status()  # Check if the request was successful
-#             forty = int(response.json()['price'][0]['d40']) # 레시피 관련 부분만 가지고 옴
-#             thirty = int(response.json()['price'][0]['d30'])
-#             twenty = int(response.json()['price'][0]['d20'])
-#             ten = int(response.json()['price'][0]['d10'])
-#             today = int(response.json()['price'][0]['d0'])
+
         
-#             # 모델에 저장
-#             ChangePriceMonth2(
-#                 ingredient = self.ingredient,
-#                 forty = forty,
-#                 thirty = thirty,
-#                 twenty = twenty,
-#                 ten = ten,
-#                 today = today
-#             ).save()
-#             dayprice_serializer = ChangePriceDaySerializer(dayprice)
-#             monthprice_serializer = ChangePriceMonthSerializer(monthprice)
-#             return Response({"dayprice": dayprice_serializer.data, "monthprice" : monthprice_serializer.data})
-
-
-#         except requests.exceptions.RequestException as e:
-#             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-#         return Response({"status": "success"}, status=status.HTTP_200_OK)
-
-# from rest_framework.response import Response
-# from rest_framework import status
-# from rest_framework.views import APIView
-# import requests
-# from .models import ChangePriceDay, ChangePriceMonth2, Ingredient
-# from .serializers import ChangePriceDaySerializer, ChangePriceMonthSerializer
-# from django.shortcuts import get_object_or_404
 
 
 class MonthSearchView(APIView):
@@ -156,27 +79,6 @@ class MonthSearchView(APIView):
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
-#     def get(self , request):
-#         dayprice = ChangePriceDay.objects.order_by('price').first()
-#         monthprice = ChangePriceMonth.objects.order_by('today').first()
-#         if dayprice & monthprice:
-#             dayprice_serializer = ChangePriceDaySerializer(dayprice, many=True)
-#             monthprice_serializer = ChangePriceMonthSerializer(monthprice, many=True)
-#             return Response({"dayprice": dayprice_serializer.data, "monthprice" : monthprice_serializer.data})
-#         return Response({"error": "No data found"}, status=status.HTTP_404_NOT_FOUND)
-# # Create your views here.
-# @api_view(['GET'])
-# def ingredientpage(request):
-#     dayprice = ChangePriceDay.objects.order_by('price').first()
-#     monthprice = ChangePriceMonth.objects.order_by('today').first()
-#     if dayprice & monthprice:
-#         dayprice_serializer = ChangePriceDaySerializer(dayprice, many=True)
-#         monthprice_serializer = ChangePriceMonthSerializer(monthprice, many=True)
-#         return Response({"dayprice": dayprice_serializer.data, "monthprice" : monthprice_serializer.data})
-#     return Response({"error": "No data found"}, status=status.HTTP_404_NOT_FOUND)
-
-
-
 
 
 
@@ -306,3 +208,17 @@ class RecipeIngredientStoreView(APIView):
                     RecipeIngredient.objects.create(recipe=recipe, ingredient=ingredient)
 
         return Response({"message": "All recipe ingredients updated successfully."}, status=status.HTTP_200_OK)
+@api_view(['GET'])
+def related_recipe(request):
+    changeprice = ChangePriceDay.objects.order_by('price').first()
+    if changeprice:
+        ingredient = changeprice.ingredient
+        recipe_ingredients = RecipeIngredient.objects.filter(ingredient=ingredient)
+
+        if recipe_ingredients.exists():
+            recipes = Recipe.objects.filter(id__in=recipe_ingredients.values_list('recipe_id', flat=True))
+            serializer = TodayRecipeSerializer(recipes, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "No related recipes found"}, status=status.HTTP_404_NOT_FOUND)
+    return Response({"error": "No price data available"}, status=status.HTTP_404_NOT_FOUND)
