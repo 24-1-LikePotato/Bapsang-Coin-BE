@@ -19,6 +19,9 @@ secret_file = BASE_DIR / 'secrets.json'
 # ]
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, '_static')
+
 with open(secret_file) as f:
     secrets = json.loads(f.read())
 
