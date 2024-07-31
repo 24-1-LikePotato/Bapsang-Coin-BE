@@ -14,3 +14,10 @@ from django.core.wsgi import get_wsgi_application
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Zipbab.settings')
 
 application = get_wsgi_application()
+
+# 스케줄러 시작
+from api.views import cron_prices, scheduler_started
+
+if not scheduler_started:
+    cron_prices()
+    scheduler_started = True
