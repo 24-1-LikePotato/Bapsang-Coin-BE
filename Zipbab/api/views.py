@@ -1,8 +1,7 @@
-# views.py
-
 from apscheduler.schedulers.background import BackgroundScheduler
-from .models import Ingredient, ChangePriceDay
-from .serializers import IngredientSerializer
+from main.models import Ingredient
+from price.models import ChangePriceDay
+from main.serializers import IngredientSerializer
 import requests
 import time
 import datetime

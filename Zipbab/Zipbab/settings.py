@@ -36,7 +36,13 @@ SECRET_KEY = get_secret('SECRET_KEY')
 
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'ec2-13-124-33-210.ap-northeast-2.compute.amazonaws.com',
+    'localhost',
+    'zipbab-coin.p-e.kr',
+    '13.214.33.210',
+]
 
 INSTALLED_APPS = [
     # my app
