@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # third-party
     'rest_framework',
     'rest_framework_simplejwt',
+    'drf_yasg',
 
     # basic - django
     'django.contrib.admin',

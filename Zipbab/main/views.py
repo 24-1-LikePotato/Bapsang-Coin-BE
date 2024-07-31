@@ -12,7 +12,6 @@ import environ
 import requests
 import random
 from django.conf import settings
-
     
 env = environ.Env(DEBUG=(bool, True))
 
@@ -20,18 +19,6 @@ environ.Env.read_env(
   env_file=os.path.join(settings.BASE_DIR, '.env')
 )
 
-#오늘의 식재료
-
-
-
-
-#추천 식재료 
-
-
-
-
-
-#오늘의 집밥
 class RecipeStoreView(APIView):
     serializer_class = RecipeSerializer
     recipe_api_key = env('RECIPE_API_KEY')
@@ -100,40 +87,6 @@ class RecipeIngredientStoreView(APIView):
                     RecipeIngredient.objects.create(recipe=recipe, ingredient=ingredient)
 
         return Response({"message": "All recipe ingredients updated successfully."}, status=status.HTTP_200_OK)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #식재료기본페이지
 class MonthStoreView(APIView):
@@ -273,6 +226,7 @@ class FridgeDetailView(APIView):
         serializer = FridgeSerializer(fridge)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+        
     def post(self, request, user_id):
         
         # 등록된 유저가 없다면?
@@ -309,9 +263,6 @@ class FridgeDetailView(APIView):
         # Delete the fridge ingredient
         fridge_ingredient.delete()
         return Response({'message': '식재료가 정상적으로 삭제되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
-
-    
-
 
 #레시피 보여주기
 @api_view(['GET'])
