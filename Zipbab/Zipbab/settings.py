@@ -41,7 +41,7 @@ ALLOWED_HOSTS = [
     'ec2-13-124-33-210.ap-northeast-2.compute.amazonaws.com',
     'localhost',
     'zipbab-coin.p-e.kr',
-    '13.214.33.210',
+    '13.124.33.210',
 ]
 
 INSTALLED_APPS = [
