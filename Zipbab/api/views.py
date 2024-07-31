@@ -1,31 +1,14 @@
-from django.shortcuts import render
-from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
-from rest_framework.generics import get_object_or_404
+# views.py
+
 from apscheduler.schedulers.background import BackgroundScheduler
-import time
-import os
-import environ
-import requests
-from main.models import Ingredient
-from price.models import ChangePriceDay
-from main.serializers import RecipeSerializer, IngredientSerializer
-from datetime import datetime
-from django.conf import settings
 
-# 환경변수를 불러올 수 있는 상태로 설정
-env = environ.Env(DEBUG=(bool, True))
-
-# 읽어올 환경 변수 파일을 지정
-environ.Env.read_env(
-  env_file=os.path.join(settings.BASE_DIR, '.env')
-)
+# 스케줄러가 이미 시작되었는지 확인하기 위한 전역 변수
+scheduler_started = False
 
 def job():
     print(f'******{time.strftime("%H:%M:%S")}******')
 
-    # 식재료 api 호출해서 업데이트하는 코드
+    # 식재료 API 호출해서 업데이트하는 코드
     serializer_class = IngredientSerializer
     ingredient_api_key = env('INGREDIENT_API_KEY')
     ingredient_api_id = env('INGREDIENT_API_ID')
@@ -47,27 +30,28 @@ def job():
             continue
 
         try:
-            ingredient = Ingredient.objects.get(name=name, item = item)
+            ingredient = Ingredient.objects.get(name=name, item=item)
         except Ingredient.DoesNotExist:
             continue
 
         try:
-                change_price_day = ChangePriceDay.objects.get(ingredient=ingredient)
-                change_price_day.date = datetime.today().strftime("%Y-%m-%d").date()
-                change_price_day.price = i.get('price', "-")  # price 필드 수정
-                change_price_day.updown = i.get('direction', "-")  # updown 필드 수정
-                change_price_day.updown_percent = i.get('value', "-")  # updown_percent 필드 수정
-                change_price_day.save()
+            change_price_day = ChangePriceDay.objects.get(ingredient=ingredient)
+            change_price_day.date = datetime.today().strftime("%Y-%m-%d").date()
+            change_price_day.price = i.get('price', "-")  # price 필드 수정
+            change_price_day.updown = i.get('direction', "-")  # updown 필드 수정
+            change_price_day.updown_percent = i.get('value', "-")  # updown_percent 필드 수정
+            change_price_day.save()
         except ChangePriceDay.DoesNotExist:
-                print("ChangePriceDay.DoesNotExist")
+            print("ChangePriceDay.DoesNotExist")
 
     print("************************")
 
 def cron_prices():
-    sched = BackgroundScheduler()
-    # cron - 매일 아침 6시에 실행
-    sched.add_job(job, 'cron', hour=6, minute=0, id='cron_weather')
-    sched.start()
+    global scheduler_started
 
-def index(request):
-    return render(request, 'index.html')
+    if not scheduler_started:
+        sched = BackgroundScheduler()
+        # cron - 매일 아침 6시에 실행
+        sched.add_job(job, 'cron', hour=6, minute=0, id='cron_weather')
+        sched.start()
+        scheduler_started = True
