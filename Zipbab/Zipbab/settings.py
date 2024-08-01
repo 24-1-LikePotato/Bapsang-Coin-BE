@@ -14,12 +14,6 @@ CSV_FILE_PATH = BASE_DIR / 'data' / 'ingredients.csv'
 secret_file = BASE_DIR / 'secrets.json'
 
 STATIC_URL = 'static/'
-
-# STATICFILES_DIRS는 Django가 정적 파일을 찾을 추가 디렉토리를 지정합니다.
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'staticfiles'),
-]
-
 # STATIC_ROOT는 collectstatic 명령을 실행할 때 모든 정적 파일이 모이는 디렉토리를 지정합니다.
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
