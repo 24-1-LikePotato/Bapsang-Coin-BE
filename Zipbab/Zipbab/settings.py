@@ -13,7 +13,7 @@ CSV_FILE_PATH = BASE_DIR / 'data' / 'ingredients.csv'
 # secrets.json 파일에서 시크릿 키 값 로드하기
 secret_file = BASE_DIR / 'secrets.json'
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 
 # STATICFILES_DIRS는 Django가 정적 파일을 찾을 추가 디렉토리를 지정합니다.
 STATICFILES_DIRS = [
