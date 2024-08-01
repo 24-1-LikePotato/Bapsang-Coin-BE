@@ -14,6 +14,9 @@ CSV_FILE_PATH = BASE_DIR / 'data' / 'ingredients.csv'
 secret_file = BASE_DIR / 'secrets.json'
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
