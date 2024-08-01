@@ -1,7 +1,7 @@
 secrets.json
 soyeon
 
-_static
+static
 
 **/migrations/**.py
 !**/migrations/_init_.py

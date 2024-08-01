@@ -13,14 +13,9 @@ CSV_FILE_PATH = BASE_DIR / 'data' / 'ingredients.csv'
 # secrets.json 파일에서 시크릿 키 값 로드하기
 secret_file = BASE_DIR / 'secrets.json'
 
-# STATIC_URL = '/static/'
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, "static"),  # 프로젝트 루트의 static 디렉토리
-# ]
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, '_static')
 
 with open(secret_file) as f:
     secrets = json.loads(f.read())
@@ -204,7 +199,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
