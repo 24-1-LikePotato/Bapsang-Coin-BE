@@ -109,6 +109,7 @@ CORS_ALLOWED_ORIGINS = [  # 허용할 오리진
     "http://127.0.0.1:3000",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "http://13.124.33.210:8000",
     "https://zipbab-coin.p-e.kr",
     "https://zipbab-coin-pwa-test.vercel.app",
 ]
