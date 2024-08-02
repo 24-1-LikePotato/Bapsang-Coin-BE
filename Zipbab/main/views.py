@@ -298,6 +298,15 @@ class FridgeDetailView(APIView):
 #레시피 보여주기
 @api_view(['GET'])
 def recipe(request):
-    recipe = Recipe.objects.all()
-    serializer = RecipeSerializer(recipe, many=True)
-    return Response(serializer.data)
+    recipe_name = request.GET.get('name', None)
+    
+    if recipe_name is None:
+        return Response({"error": "Recipe name not provided"}, status=400)
+    
+    try:
+        recipe_detail = Recipe.objects.filter(name=recipe_name).first()        
+        serializer = RecipeSerializer(recipe_detail)
+        return Response(serializer.data)
+    
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
