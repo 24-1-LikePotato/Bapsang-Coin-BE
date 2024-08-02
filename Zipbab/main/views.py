@@ -145,7 +145,7 @@ class MonthStoreView(APIView):
 #레시피 기본페이지
 @api_view(['GET'])
 def related_recipe(request):
-    changeprice = ChangePriceDay.objects.order_by('price').first()
+    changeprice = ChangePriceDay.objects.all().filter(updown=1).order_by('-updown_percent').first()
     if changeprice:
         ingredient = changeprice.ingredient
         recipe_ingredients = RecipeIngredient.objects.filter(ingredient=ingredient)
@@ -224,7 +224,7 @@ class MonthSearchView(APIView):
 #레시피 검색
 class RecipeSearchView(APIView):
     def get(self, request):
-        ingredient = request.GET.get('ingredient', None)
+        ingredient=request.GET.get('ingredient', None)
         print(ingredient)
         ingredients = Ingredient.objects.filter(name__icontains=ingredient)
         if ingredients.exists():
