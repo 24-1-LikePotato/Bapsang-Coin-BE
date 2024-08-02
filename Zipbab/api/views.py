@@ -59,7 +59,7 @@ def job():
 
         try:
             change_price_day = ChangePriceDay.objects.get(ingredient=ingredient)
-            today_date = datetime.datetime.strptime(recent_date, "%Y-%m-%d").date()
+            today_date = datetime.datetime.strptime(recent_date, "%Y%m%d").date()
             change_price_day.date = today_date
             change_price_day.price = validate_price(i.get('dpr1', "-1"))
             change_price_day.updown = i.get('direction', "-1")  # updown 필드 수정
@@ -77,6 +77,6 @@ def cron_prices():
     if not scheduler_started:
         sched = BackgroundScheduler(timezone='Asia/Seoul')
         # cron - 매일 아침 6시에 실행
-        sched.add_job(job, 'cron', hour=15, minute=12, id='cron_prices')
+        sched.add_job(job, 'cron', hour=15, minute=16, id='cron_prices')
         sched.start()
         scheduler_started = True
