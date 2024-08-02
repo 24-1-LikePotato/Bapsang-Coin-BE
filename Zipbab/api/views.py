@@ -5,18 +5,25 @@ from main.serializers import IngredientSerializer
 import requests
 import time
 import datetime
+import os
 from django.conf import settings
 from django.db import connection
 
 # 스케줄러가 이미 시작되었는지 확인하기 위한 전역 변수
 scheduler_started = False
 
+env = environ.Env(DEBUG=(bool, True))
+
+environ.Env.read_env(
+  env_file=os.path.join(settings.BASE_DIR, '.env')
+)
+
 def job():
     print(f'******{time.strftime("%H:%M:%S")}******')
 
     # 식재료 API 호출해서 업데이트하는 코드
-    ingredient_api_key = settings.INGREDIENT_API_KEY
-    ingredient_api_id = settings.INGREDIENT_API_ID
+    ingredient_api_key = env('INGREDIENT_API_KEY')
+    ingredient_api_id = env('INGREDIENT_API_ID')
 
     url = f'http://www.kamis.or.kr/service/price/xml.do?action=dailySalesList&p_cert_key={ingredient_api_key}&p_cert_id={ingredient_api_id}&p_returntype=json'
     response = requests.get(url)
@@ -57,6 +64,6 @@ def cron_prices():
     if not scheduler_started:
         sched = BackgroundScheduler(timezone='Asia/Seoul')
         # cron - 매일 아침 6시에 실행
-        sched.add_job(job, 'cron', hour=14, minute=10, id='cron_prices')
+        sched.add_job(job, 'cron', hour=14, minute=25, id='cron_prices')
         sched.start()
         scheduler_started = True
