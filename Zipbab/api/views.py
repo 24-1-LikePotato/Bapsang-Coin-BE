@@ -38,6 +38,7 @@ def job():
     url = f'http://www.kamis.or.kr/service/price/xml.do?action=dailySalesList&p_cert_key={ingredient_api_key}&p_cert_id={ingredient_api_id}&p_returntype=json'
     response = requests.get(url)
     response.raise_for_status()  # Check if the request was successful
+    recent_date = response.json().get('condition')[0][0]
     price_list = response.json().get('price', [])
 
     for i in price_list:
@@ -58,8 +59,7 @@ def job():
 
         try:
             change_price_day = ChangePriceDay.objects.get(ingredient=ingredient)
-            today_str = datetime.datetime.today().strftime("%Y-%m-%d")
-            today_date = datetime.datetime.strptime(today_str, "%Y-%m-%d").date()
+            today_date = datetime.datetime.strptime(recent_date, "%Y-%m-%d").date()
             change_price_day.date = today_date
             change_price_day.price = validate_price(i.get('dpr1', "-1"))
             change_price_day.updown = i.get('direction', "-1")  # updown 필드 수정
@@ -77,6 +77,6 @@ def cron_prices():
     if not scheduler_started:
         sched = BackgroundScheduler(timezone='Asia/Seoul')
         # cron - 매일 아침 6시에 실행
-        sched.add_job(job, 'cron', hour=15, minute=00, id='cron_prices')
+        sched.add_job(job, 'cron', hour=15, minute=12, id='cron_prices')
         sched.start()
         scheduler_started = True
