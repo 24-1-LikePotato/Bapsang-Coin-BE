@@ -19,6 +19,15 @@ environ.Env.read_env(
   env_file=os.path.join(settings.BASE_DIR, '.env')
 )
 
+def validate_price(price):
+    try:
+        # 쉼표가 포함된 숫자 문자열을 처리
+        if isinstance(price, str):
+            price = price.replace(',', '')
+        return int(price)
+    except (ValueError, TypeError):
+        return -1
+
 def job():
     print(f'******{time.strftime("%H:%M:%S")}******')
 
@@ -52,7 +61,7 @@ def job():
             today_str = datetime.datetime.today().strftime("%Y-%m-%d")
             today_date = datetime.datetime.strptime(today_str, "%Y-%m-%d").date()
             change_price_day.date = today_date
-            change_price_day.price = i.get('dpr1', "-1")  # price 필드 수정
+            change_price_day.price = validate_price(i.get('dpr1', "-1"))
             change_price_day.updown = i.get('direction', "-1")  # updown 필드 수정
             change_price_day.updown_percent = i.get('value', "-1")  # updown_percent 필드 수정
             print(f"{product_name} : {change_price_day.price}원 | {change_price_day.updown} | {change_price_day.updown_percent}%")
@@ -68,6 +77,6 @@ def cron_prices():
     if not scheduler_started:
         sched = BackgroundScheduler(timezone='Asia/Seoul')
         # cron - 매일 아침 6시에 실행
-        sched.add_job(job, 'cron', hour=14, minute=55, id='cron_prices')
+        sched.add_job(job, 'cron', hour=15, minute=00, id='cron_prices')
         sched.start()
         scheduler_started = True
