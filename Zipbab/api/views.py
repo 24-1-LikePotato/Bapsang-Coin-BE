@@ -52,9 +52,9 @@ def job():
             today_str = datetime.datetime.today().strftime("%Y-%m-%d")
             today_date = datetime.datetime.strptime(today_str, "%Y-%m-%d").date()
             change_price_day.date = today_date
-            change_price_day.price = i.get('price', "-")  # price 필드 수정
-            change_price_day.updown = i.get('direction', "-")  # updown 필드 수정
-            change_price_day.updown_percent = i.get('value', "-")  # updown_percent 필드 수정
+            change_price_day.price = i.get('price', "-1")  # price 필드 수정
+            change_price_day.updown = i.get('direction', "-1")  # updown 필드 수정
+            change_price_day.updown_percent = i.get('value', "-1")  # updown_percent 필드 수정
             change_price_day.save()
         except ChangePriceDay.DoesNotExist:
             print("ChangePriceDay.DoesNotExist")
@@ -67,6 +67,6 @@ def cron_prices():
     if not scheduler_started:
         sched = BackgroundScheduler(timezone='Asia/Seoul')
         # cron - 매일 아침 6시에 실행
-        sched.add_job(job, 'cron', hour=14, minute=40, id='cron_prices')
+        sched.add_job(job, 'cron', hour=14, minute=43, id='cron_prices')
         sched.start()
         scheduler_started = True
