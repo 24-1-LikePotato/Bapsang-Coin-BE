@@ -55,8 +55,8 @@ def cron_prices():
     global scheduler_started
 
     if not scheduler_started:
-        sched = BackgroundScheduler()
+        sched = BackgroundScheduler(timezone='Asia/Seoul')
         # cron - 매일 아침 6시에 실행
-        sched.add_job(job, 'cron', hour=14, minute=00, id='cron_prices')
+        sched.add_job(job, 'cron', hour=14, minute=10, id='cron_prices')
         sched.start()
         scheduler_started = True
