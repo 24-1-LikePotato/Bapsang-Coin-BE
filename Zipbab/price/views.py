@@ -31,6 +31,9 @@ class UpdateIngredientPriceView(APIView):
         processed_names = set()  # 이미 처리된 name을 추적하는 세트
 
         for i in price_list:
+            if i.get('product_cls_name') != "소매":
+                continue
+                
             product_name = i.get('productName')
 
             if not product_name:

@@ -42,6 +42,9 @@ def job():
     price_list = response.json().get('price', [])
 
     for i in price_list:
+        if i.get('product_cls_name') != "소매":
+            continue
+
         product_name = i.get('productName')
 
         if not product_name:
@@ -77,6 +80,6 @@ def cron_prices():
     if not scheduler_started:
         sched = BackgroundScheduler(timezone='Asia/Seoul')
         # cron - 매일 아침 6시에 실행
-        sched.add_job(job, 'cron', hour=15, minute=16, id='cron_prices')
+        sched.add_job(job, 'cron', hour=15, minute=45, id='cron_prices')
         sched.start()
         scheduler_started = True
