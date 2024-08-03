@@ -36,6 +36,7 @@ class UpdateIngredientPriceView(APIView):
                 continue
                 
             product_name = i.get('productName')
+            print(product_name)
 
             if not product_name:
                 continue
@@ -48,14 +49,14 @@ class UpdateIngredientPriceView(APIView):
             if name in processed_names:
                 continue  # 이미 처리된 name이면 건너뜀
 
-            ingredient, created = Ingredient.objects.get_or_create(name=name)
-            if not created:
-                continue  # 이미 존재하는 name이면 건너뜀
+            # ingredient, created = Ingredient.objects.get_or_create(name=name)
+            # if not created:
+            #     continue  # 이미 존재하는 name이면 건너뜀
 
-            ingredient.item = item  # item 필드 업데이트
-            ingredient.code = i.get('productno', ingredient.code)
-            ingredient.unit = i.get('unit', ingredient.unit)
-            ingredient.save()
+            # ingredient.item = item  # item 필드 업데이트
+            # ingredient.code = i.get('productno', ingredient.code)
+            # ingredient.unit = i.get('unit', ingredient.unit)
+            # ingredient.save()
 
             # name을 처리된 세트에 추가
             processed_names.add(name)
@@ -72,6 +73,8 @@ class UpdateIngredientPriceView(APIView):
 
             print(f"Processing {name} for date {date}")  # 디버깅 로그
 
+            ingredient=Ingredient.objects.get(name=name)
+            print(ingredient)
             change_price_day, created = ChangePriceDay.objects.get_or_create(
                 ingredient=ingredient,
                 date=date,
