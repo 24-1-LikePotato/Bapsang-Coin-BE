@@ -91,7 +91,7 @@ def job2():
         response.raise_for_status()  # Check if the request was successful
         recent_date_list = response.json().get('condition', [])[0]
         recent_date_origin = recent_date_list.get('p_regday', "")
-        recent_date = datetime.datetime.strptime(recent_date_origin, "%Y%m%d").date()
+        recent_date = datetime.datetime.strptime(recent_date_origin, "%Y-%m-%d").date()
         price_list = response.json().get('price', [])
 
         if not isinstance(response.json()['price'][0]['d40'], str):
@@ -133,7 +133,7 @@ def cron_prices():
     if not scheduler_started:
         sched = BackgroundScheduler(timezone='Asia/Seoul')
         # cron - 매일 아침 6시에 실행
-        sched.add_job(job, 'cron', hour=21, minute=13, id='cron_prices')
-        sched.add_job(job2, 'cron', hour=21, minute=13, id='cron_prices2')
+        sched.add_job(job, 'cron', hour=21, minute=17, id='cron_prices')
+        sched.add_job(job2, 'cron', hour=21, minute=17, id='cron_prices2')
         sched.start()
         scheduler_started = True
