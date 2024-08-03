@@ -127,7 +127,7 @@ class MonthStoreView(APIView):
             else:
                 ten=int(response.json()['price'][0]['d10'])
             if not isinstance(response.json()['price'][0]['d0'], str):
-                today=0
+                today=ten
             else:
                 today=int(response.json()['price'][0]['d0'])
         
@@ -206,7 +206,7 @@ class MonthSearchView(APIView):
                 else:
                     ten=int(response.json()['price'][0]['d10'])
                 if not isinstance(response.json()['price'][0]['d0'], str):
-                    today=0
+                    today=ten
                 else:
                     today=int(response.json()['price'][0]['d0'])
                 
