@@ -100,6 +100,7 @@ class MonthStoreView(APIView):
     ingredient_api_id = env('INGREDIENT_API_ID')
     if ingredient is not None:
         ingredient_product_code = ingredient.code
+        unit = ingredient.unit
     else:
         ingredient_product_code = None  # 또는 다른 기본 값 할당
     
