@@ -59,8 +59,7 @@ class UpdateIngredientPriceView(APIView):
 
             # name을 처리된 세트에 추가
             processed_names.add(name)
-
-            today_date = datetime.datetime.strptime(recent_date, "%Y%m%d").date()
+            today_date = datetime.strptime(recent_date, "%Y%m%d").date()
             date = today_date
 
             try:
