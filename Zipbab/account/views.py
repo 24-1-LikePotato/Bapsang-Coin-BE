@@ -35,12 +35,8 @@ class ActivateSubscriptionView(APIView):
 # 나중에 배포하면 꼭 바꾸기 = 카카오 디벨로퍼에서 바꿔야함!
 # 지금 클라이언트 ID도 테스트앱의 ID라 나중에 원래 앱의 클라이언트 ID로 바꿔야 함
 
-BASE_URL = 'http://127.0.0.1:8000/'
+BASE_URL = 'zipbab-coin.p-e.kr'
 KAKAO_CALLBACK_URI = BASE_URL + 'account/kakao/callback'
-#SOCIAL_AUTH_KAKAO_CLIENT_ID ='b3b591e0bea504302e17de1dd109dec2'
-
-
-
 
 
 def kakao_login(request):
