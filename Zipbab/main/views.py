@@ -178,60 +178,12 @@ class MonthSearchView(APIView):
                 return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
             ingredient_ids = ingredients.id
             dayprice = ChangePriceDay.objects.filter(ingredient=ingredients).first()
-            if dayprice is None:
-                return Response({"error": "No day price data found for the given ingredient"}, status=status.HTTP_400_BAD_REQUEST)
             monthprice = ChangePriceMonth2.objects.filter(ingredient__id=ingredient_ids).first()
-            ingredient1 = get_object_or_404(Ingredient, name = dayprice.ingredient.name)
-            ingredient_api_key = env('INGREDIENT_API_KEY')
-            ingredient_api_id = env('INGREDIENT_API_ID')
-            ingredient_product_code = ingredient1.code
-            url = f'http://www.kamis.or.kr/service/price/xml.do?action=recentlyPriceTrendList&p_productno={ingredient_product_code}&p_cert_key={ingredient_api_key}&p_cert_id={ingredient_api_id}&p_returntype=json'
 
-            try:
-                # 가격 데이터 추출
-                response = requests.get(url)
-                response.raise_for_status()  # Check if the request was successful
-                if not isinstance(response.json()['price'][0]['d40'], str):
-                    forty=0
-                else:
-                    forty=int(response.json()['price'][0]['d40'])
-                if not isinstance(response.json()['price'][0]['d30'], str):
-                    thirty=0
-                else:
-                    thirty=int(response.json()['price'][0]['d30'])
-                if not isinstance(response.json()['price'][0]['d20'], str):
-                    twenty=0
-                else:
-                    twenty=int(response.json()['price'][0]['d20'])
-                if not isinstance(response.json()['price'][0]['d10'], str):
-                    ten=0
-                else:
-                    ten=int(response.json()['price'][0]['d10'])
-                if not isinstance(response.json()['price'][0]['d0'], str):
-                    today=dayprice.price
-                else:
-                    if dayprice.price != int(response.json()['price'][0]['d0']):
-                        today=dayprice.price
-                    else:
-                        today=int(response.json()['price'][0]['d0'])
-                
-                # 모델에 저장
-                ChangePriceMonth2(
-                ingredient = ingredient1,
-                forty = forty,
-                thirty = thirty,
-                twenty = twenty,
-                ten = ten,
-                today = today
-                ).save()
-
-                # 직렬화 및 응답
-                dayprice_serializer = ChangePriceDaySerializer(dayprice)
-                monthprice_serializer = ChangePriceMonthSerializer(monthprice)
-                return Response({"dayprice": dayprice_serializer.data, "monthprice": monthprice_serializer.data})
-
-            except requests.exceptions.RequestException as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+             # 직렬화 및 응답
+            dayprice_serializer = ChangePriceDaySerializer(dayprice)
+            monthprice_serializer = ChangePriceMonthSerializer(monthprice)
+            return Response({"dayprice": dayprice_serializer.data, "monthprice": monthprice_serializer.data})
 
         return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
 
