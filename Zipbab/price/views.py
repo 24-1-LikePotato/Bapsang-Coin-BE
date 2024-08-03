@@ -27,6 +27,7 @@ class UpdateIngredientPriceView(APIView):
         response = requests.get(url)
         response.raise_for_status()
         price_list = response.json()['price']
+        recent_date = response.json().get('condition')[0][0]
 
         processed_names = set()  # 이미 처리된 name을 추적하는 세트
 
@@ -58,17 +59,8 @@ class UpdateIngredientPriceView(APIView):
 
             # name을 처리된 세트에 추가
             processed_names.add(name)
-
-            # Update or create ChangePriceDay
-            date_str = i.get('day1')
-            if date_str == "당일":
-                date = datetime.today().date()
-            else:
-                try:
-                    date = datetime.strptime(date_str, '%Y-%m-%d').date()  # 문자열을 date 객체로 변환
-                except (ValueError, TypeError):
-                    print(f"Skipping due to invalid date format: {date_str}")  # 디버깅 로그
-                    continue
+            today_date = datetime.strptime(recent_date, "%Y%m%d").date()
+            date = today_date
 
             try:
                 price = int(i.get('dpr1', '0').replace(',', ''))
