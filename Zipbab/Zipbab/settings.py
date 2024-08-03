@@ -26,7 +26,7 @@ def get_secret(setting, secrets=secrets):
 # 시크릿키와 서명키 가져오기
 SECRET_KEY = get_secret('SECRET_KEY')
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
