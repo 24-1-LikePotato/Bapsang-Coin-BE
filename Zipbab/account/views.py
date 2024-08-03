@@ -35,7 +35,7 @@ class ActivateSubscriptionView(APIView):
 # 나중에 배포하면 꼭 바꾸기 = 카카오 디벨로퍼에서 바꿔야함!
 # 지금 클라이언트 ID도 테스트앱의 ID라 나중에 원래 앱의 클라이언트 ID로 바꿔야 함
 
-BASE_URL = 'zipbab-coin.p-e.kr'
+BASE_URL = 'zipbab-coin.p-e.kr/'
 KAKAO_CALLBACK_URI = BASE_URL + 'account/kakao/callback'
 
 
