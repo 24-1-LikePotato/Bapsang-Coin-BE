@@ -106,50 +106,11 @@ class MonthStoreView(APIView):
     
 
     def get(self, request):
-        url = f'http://www.kamis.or.kr/service/price/xml.do?action=recentlyPriceTrendList&p_productno={self.ingredient_product_code}&p_cert_key={self.ingredient_api_key}&p_cert_id={self.ingredient_api_id}&p_returntype=json'
-        try:
-            response = requests.get(url)
-            response.raise_for_status()  # Check if the request was successful
-            if not isinstance(response.json()['price'][0]['d40'], str):
-                forty=0
-            else:
-                forty=int(response.json()['price'][0]['d40'])
-            if not isinstance(response.json()['price'][0]['d30'], str):
-                thirty=0
-            else:
-                thirty=int(response.json()['price'][0]['d30'])
-            if not isinstance(response.json()['price'][0]['d20'], str):
-                twenty=0
-            else:
-                twenty=int(response.json()['price'][0]['d20'])
-            if not isinstance(response.json()['price'][0]['d10'], str):
-                ten=0
-            else:
-                ten=int(response.json()['price'][0]['d10'])
-            if not isinstance(response.json()['price'][0]['d0'], str):
-                today=ten
-            else:
-                today=int(response.json()['price'][0]['d0'])
-        
-            # 모델에 저장
-            ChangePriceMonth2(
-                ingredient = self.ingredient,
-                forty = forty,
-                thirty = thirty,
-                twenty = twenty,
-                ten = ten,
-                today = today
-            ).save()
-            dayprice = ChangePriceDay.objects.all().filter(updown=1).order_by('-updown_percent').first()
-            monthprice = ChangePriceMonth2.objects.filter(ingredient=self.ingredient).first()
-            dayprice_serializer = ChangePriceDaySerializer(dayprice)
-            monthprice_serializer = ChangePriceMonthSerializer(monthprice)
-            return Response({"dayprice": dayprice_serializer.data, "monthprice" : monthprice_serializer.data})
-
-
-        except requests.exceptions.RequestException as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({"status": "success"}, status=status.HTTP_200_OK)
+        dayprice = ChangePriceDay.objects.all().filter(updown=1).order_by('-updown_percent').first()
+        monthprice = ChangePriceMonth2.objects.filter(ingredient=self.ingredient).first()
+        dayprice_serializer = ChangePriceDaySerializer(dayprice)
+        monthprice_serializer = ChangePriceMonthSerializer(monthprice)
+        return Response({"dayprice": dayprice_serializer.data, "monthprice" : monthprice_serializer.data})
 
 #레시피 기본페이지
 @api_view(['GET'])
