@@ -36,7 +36,7 @@ class ActivateSubscriptionView(APIView):
 # 지금 클라이언트 ID도 테스트앱의 ID라 나중에 원래 앱의 클라이언트 ID로 바꿔야 함
 
 BASE_URL = 'https://zipbab-coin.p-e.kr/'
-#BASE_URL = 'http://127.0.0.1:8000/'
+BASE_URL = 'http://127.0.0.1:8000/'
 
 KAKAO_CALLBACK_URI = BASE_URL + 'account/kakao/callback'
 
@@ -101,13 +101,13 @@ def kakao_callback(request):
         refresh_token = str(token)
         access_token = str(token.access_token)
 
-        res = JsonResponse(
-            {
-                "user_id":user.pk,
-                "access_token": access_token,
-                "refresh_token": refresh_token,
+        res = Response(
+        {
+            "user_id": user.pk,
+            "access_token": access_token,
+            "refresh_token": refresh_token,
             },
-            status=status.HTTP_200_OK,
+            status=status.HTTP_200_OK
         )
 
         return res
@@ -128,16 +128,14 @@ def kakao_callback(request):
         refresh_token = str(token)
         access_token = str(token.access_token)
 
-        res = JsonResponse(
-            {
-                "user_id":user.pk,
-                "access_token": access_token,
-                "refresh_token": refresh_token,
+        res = Response(
+        {
+            "user_id": user.pk,
+            "access_token": access_token,
+            "refresh_token": refresh_token,
             },
-            status=status.HTTP_200_OK,
+            status=status.HTTP_200_OK
         )
-
-        return res
         # redirect_url = f"{FRONTEND_URL}/login?access={access_token}&refresh={refresh_token}"
         # return HttpResponseRedirect(redirect_url)
 
