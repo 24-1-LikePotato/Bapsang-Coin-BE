@@ -260,7 +260,7 @@ class FridgeDetailView(APIView):
         fridge_ingredients = FridgeIngredient.objects.filter(fridge=fridge)
 
         if not fridge_ingredients.exists():
-            return Response({'message': '등록한 식재료가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'message': '등록한 식재료가 없습니다.','user':user_id,'ingredients':[]}, status=status.HTTP_404_NOT_FOUND)
         
         serializer = FridgeSerializer(fridge)
 
