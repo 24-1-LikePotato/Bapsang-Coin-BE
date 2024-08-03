@@ -90,7 +90,7 @@ def job2():
         response = requests.get(url)
         response.raise_for_status()  # Check if the request was successful
         recent_date_list = response.json().get('condition', [])[0]
-        recent_date = recent_date_list.get('p_regday', "").date()
+        recent_date = recent_date_list.get('p_regday', "")
         price_list = response.json().get('price', [])
 
         if not isinstance(response.json()['price'][0]['d40'], str):
