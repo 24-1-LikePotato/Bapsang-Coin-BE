@@ -127,12 +127,9 @@ class MonthStoreView(APIView):
             else:
                 ten=int(response.json()['price'][0]['d10'])
             if not isinstance(response.json()['price'][0]['d0'], str):
-                today=dayprice.price
+                today=ten
             else:
-                if dayprice.price != int(response.json()['price'][0]['d0']):
-                    today=dayprice.price
-                else:
-                    today=int(response.json()['price'][0]['d0'])
+                today=int(response.json()['price'][0]['d0'])
         
             # 모델에 저장
             ChangePriceMonth2(
