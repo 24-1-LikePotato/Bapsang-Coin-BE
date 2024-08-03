@@ -36,7 +36,6 @@ class ActivateSubscriptionView(APIView):
 # 지금 클라이언트 ID도 테스트앱의 ID라 나중에 원래 앱의 클라이언트 ID로 바꿔야 함
 
 BASE_URL = 'https://zipbab-coin.p-e.kr/'
-BASE_URL = 'http://127.0.0.1:8000/'
 
 KAKAO_CALLBACK_URI = BASE_URL + 'account/kakao/callback'
 
