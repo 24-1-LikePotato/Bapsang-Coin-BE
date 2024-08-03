@@ -133,7 +133,7 @@ def cron_prices():
     if not scheduler_started:
         sched = BackgroundScheduler(timezone='Asia/Seoul')
         # cron - 매일 아침 6시에 실행
-        sched.add_job(job, 'cron', hour=21, minute=45, id='cron_prices')
-        sched.add_job(job2, 'cron', hour=21, minute=45, id='cron_prices2')
+        sched.add_job(job, 'cron', hour=15, minute=45, id='cron_prices')
+        sched.add_job(job2, 'cron', hour=15, minute=45, id='cron_prices2')
         sched.start()
         scheduler_started = True
