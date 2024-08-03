@@ -1,16 +1,6 @@
 from django.db import models
 from main.models import Ingredient
 
-class ChangePriceMonth1(models.Model): # 7번 api 맞게 수정 필요 (그래프에 사용)
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    forty = models.IntegerField()
-    thirty = models.IntegerField()
-    twenty = models.IntegerField()
-    ten = models.IntegerField()
-    today = models.IntegerField()
-    def __str__(self) -> str:
-        return f"[ {self.ingredient.name} ] : {self.month}월 가격"
-
 class ChangePriceDay(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     date = models.DateField()  # 일 단위로 저장

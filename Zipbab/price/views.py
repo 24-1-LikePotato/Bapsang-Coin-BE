@@ -53,6 +53,7 @@ class UpdateIngredientPriceView(APIView):
 
             ingredient.item = item  # item 필드 업데이트
             ingredient.code = i.get('productno', ingredient.code)
+            ingredient.unit = i.get('unit', ingredient.unit)
             ingredient.save()
 
             # name을 처리된 세트에 추가

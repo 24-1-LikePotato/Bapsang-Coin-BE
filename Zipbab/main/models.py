@@ -1,5 +1,6 @@
 from django.db import models
 from account.models import User
+from datetime import datetime
 
 class Fridge(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -11,6 +12,7 @@ class Ingredient(models.Model):
     name = models.CharField(max_length=50,verbose_name='품종', default='NONE')
     item = models.CharField(max_length=50,verbose_name='품목', default='NONE')
     code = models.CharField(max_length=50,verbose_name='식품코드', default='0')
+    unit = models.CharField(max_length=50,verbose_name='단위',default='0')
 
     def __str__(self) -> str:
         return self.name
@@ -25,6 +27,13 @@ class FridgeIngredient(models.Model):
     def __str__(self) -> str:
         return f"{self.fridge.user.nickname}의 냉장고 - {self.ingredient.name}"
 
+    def days_until_expiration(self):
+        today = datetime.now().date()
+        delta = self.expiration_date - today
+        return delta.days
+
+    def is_expiring_soon(self, threshold=1):
+        return self.days_until_expiration() <= threshold
 
 class Recipe(models.Model):
     name = models.CharField(max_length=30) # 메뉴명

@@ -91,10 +91,18 @@ class RecipeIngredientStoreView(APIView):
 #식재료기본페이지
 class MonthStoreView(APIView):
     dayprice = ChangePriceDay.objects.all().filter(updown=1).order_by('-updown_percent').first()
-    ingredient = get_object_or_404(Ingredient, name = dayprice.ingredient.name)
+    if dayprice and dayprice.ingredient:
+        ingredient = get_object_or_404(Ingredient, name=dayprice.ingredient.name)
+    else:
+    # 처리: 예를 들어, 예외를 발생시키거나 기본 값을 할당
+        ingredient = None  # 또는 기본 값을 할당
     ingredient_api_key = env('INGREDIENT_API_KEY')
     ingredient_api_id = env('INGREDIENT_API_ID')
-    ingredient_product_code = ingredient.code
+    if ingredient is not None:
+        ingredient_product_code = ingredient.code
+    else:
+        ingredient_product_code = None  # 또는 다른 기본 값 할당
+    
 
     def get(self, request):
         url = f'http://www.kamis.or.kr/service/price/xml.do?action=recentlyPriceTrendList&p_productno={self.ingredient_product_code}&p_cert_key={self.ingredient_api_key}&p_cert_id={self.ingredient_api_id}&p_returntype=json'
