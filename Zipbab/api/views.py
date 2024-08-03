@@ -1,6 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from main.models import Ingredient
-from price.models import ChangePriceDay
+from price.models import ChangePriceDay, ChangePriceMonth2
 from main.serializers import IngredientSerializer
 import requests
 import time
@@ -74,12 +74,65 @@ def job():
 
     print("************************")
 
+
+def job2():
+    print(f'******{time.strftime("%H:%M:%S")}******')
+
+    # 식재료 API 호출해서 업데이트하는 코드
+    ingredient_api_key = env('INGREDIENT_API_KEY')
+    ingredient_api_id = env('INGREDIENT_API_ID')
+
+    ingredient_list = Ingredient.objects.all()
+
+    for i in ingredient_list:
+        ingredient_product_code = i.code
+        url = f'http://www.kamis.or.kr/service/price/xml.do?action=recentlyPriceTrendList&p_productno={ingredient_product_code}&p_cert_key={ingredient_api_key}&p_cert_id={ingredient_api_id}&p_returntype=json'
+        response = requests.get(url)
+        response.raise_for_status()  # Check if the request was successful
+        recent_date_list = response.json().get('condition', [])[0]
+        recent_date = recent_date_list.get('p_regday', "").date()
+        price_list = response.json().get('price', [])
+
+        if not isinstance(response.json()['price'][0]['d40'], str):
+            forty=0
+        else:
+            forty=int(response.json()['price'][0]['d40'])
+        if not isinstance(response.json()['price'][0]['d30'], str):
+            thirty=0
+        else:
+            thirty=int(response.json()['price'][0]['d30'])
+        if not isinstance(response.json()['price'][0]['d20'], str):
+            twenty=0
+        else:
+            twenty=int(response.json()['price'][0]['d20'])
+        if not isinstance(response.json()['price'][0]['d10'], str):
+            ten=0
+        else:
+            ten=int(response.json()['price'][0]['d10'])
+        if not isinstance(response.json()['price'][0]['d0'], str):
+            today=ten
+        else:
+            today=int(response.json()['price'][0]['d0'])
+    
+        # 모델에 저장
+        ChangePriceMonth2(
+            ingredient = i,
+            forty = forty,
+            thirty = thirty,
+            twenty = twenty,
+            ten = ten,
+            today = today
+        ).save()
+
+    print("************************")
+
 def cron_prices():
     global scheduler_started
 
     if not scheduler_started:
         sched = BackgroundScheduler(timezone='Asia/Seoul')
         # cron - 매일 아침 6시에 실행
-        sched.add_job(job, 'cron', hour=15, minute=45, id='cron_prices')
+        sched.add_job(job, 'cron', hour=20, minute=45, id='cron_prices')
+        sched.add_job(job2, 'cron', hour=20, minute=45, id='cron_prices2')
         sched.start()
         scheduler_started = True
