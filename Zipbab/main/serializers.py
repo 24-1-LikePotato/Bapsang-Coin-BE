@@ -47,7 +47,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ['name']
+        fields = ['name', 'unit']
 
 class ChangePriceDaySerializer(serializers.ModelSerializer):
     ingredient = IngredientSerializer()

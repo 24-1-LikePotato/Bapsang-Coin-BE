@@ -14,7 +14,8 @@ class ChangePriceMonthSerializer(serializers.ModelSerializer):
 
 class TodayIngredientSerializer(serializers.ModelSerializer):
     ingredient_name = serializers.CharField(source='ingredient.name')
+    unit = serializers.CharField(source='ingredient.unit')
 
     class Meta:
         model = ChangePriceDay
-        fields = ['ingredient_name', 'price', 'updown', 'updown_percent']
+        fields = ['ingredient_name', 'unit', 'price', 'updown', 'updown_percent']
