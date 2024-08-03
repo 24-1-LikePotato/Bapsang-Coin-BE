@@ -53,7 +53,7 @@ class ChangePriceDaySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChangePriceDay
-        fields = ['ingredient', 'price', 'updown_percent']
+        fields = ['ingredient', 'price', 'updown', 'updown_percent']
  
 
 class ChangePriceMonthSerializer(serializers.ModelSerializer):
