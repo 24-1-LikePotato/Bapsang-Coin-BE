@@ -1,3 +1,11 @@
+secrets.json
+soyeon
+
+static
+
+**/migrations/**.py
+!**/migrations/_init_.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -60,6 +68,7 @@ cover/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+db.mysql
 
 # Flask stuff:
 instance/
@@ -122,6 +131,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+Zipbab_env
 .env
 .venv
 env/
