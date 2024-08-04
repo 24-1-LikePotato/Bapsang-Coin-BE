@@ -26,9 +26,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
           
-      # S3로 압축 파일 업로드
-      - name: upload to S3
-        run: aws s3 cp --region ${{ secrets.AWS_REGION }} ./server.zip s3://${{secrets.BUCKET_NAME}}/public/
 
       - name: Create deployment
         run: |
