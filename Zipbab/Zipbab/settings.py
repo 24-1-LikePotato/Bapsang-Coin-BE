@@ -34,6 +34,7 @@ ALLOWED_HOSTS = [
     'localhost',
     'zipbab-coin.p-e.kr',
     '13.124.33.210',
+    'zipbab-s3.s3-website.ap-northeast-2.amazonaws.com',
 ]
 
 INSTALLED_APPS = [
@@ -101,6 +102,7 @@ CORS_ALLOWED_ORIGINS = [  # 허용할 오리진
     "http://13.124.33.210:8000",
     "https://zipbab-coin.p-e.kr",
     "https://zipbab-coin-pwa-test.vercel.app",
+    "http://zipbab-s3.s3-website.ap-northeast-2.amazonaws.com",
 ]
 
 ROOT_URLCONF = 'Zipbab.urls'
