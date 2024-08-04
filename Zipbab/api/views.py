@@ -115,7 +115,7 @@ def job2():
         else:
             today=int(response.json()['price'][0]['d0'])
     
-        change_price_month = ChangePriceMonth2.objects.get(ingredient=ingredient)
+        change_price_month = ChangePriceMonth2.objects.get(ingredient=i)
         change_price_month.forty = forty
         change_price_month.thirty = thirty
         change_price_month.twenty = twenty
@@ -132,7 +132,7 @@ def cron_prices():
     if not scheduler_started:
         sched = BackgroundScheduler(timezone='Asia/Seoul')
         # cron - 매일 아침 6시에 실행
-        sched.add_job(job, 'cron', hour=17, minute=35, id='cron_prices')
-        sched.add_job(job2, 'cron', hour=17, minute=35, id='cron_prices2')
+        sched.add_job(job, 'cron', hour=18, minute=05, id='cron_prices')
+        sched.add_job(job2, 'cron', hour=18, minute=05, id='cron_prices2')
         sched.start()
         scheduler_started = True
