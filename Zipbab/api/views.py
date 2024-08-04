@@ -115,15 +115,14 @@ def job2():
         else:
             today=int(response.json()['price'][0]['d0'])
     
-        # 모델에 저장
-        ChangePriceMonth2(
-            ingredient = i,
-            forty = forty,
-            thirty = thirty,
-            twenty = twenty,
-            ten = ten,
-            today = today
-        ).save()
+        change_price_month = ChangePriceMonth2.objects.get(ingredient=ingredient)
+        change_price_month.forty = forty
+        change_price_month.thirty = thirty
+        change_price_month.twenty = twenty
+        change_price_month.ten = ten
+        change_price_month.today = today
+        print(f"{recent_date} ) {i.name} | 40일전: {forty} | 30일전: {thirty} | 20일전: {twenty} | 10일전: {ten} | 오늘: {today}")
+        change_price_month.save()
 
     print("************************")
 
@@ -133,7 +132,7 @@ def cron_prices():
     if not scheduler_started:
         sched = BackgroundScheduler(timezone='Asia/Seoul')
         # cron - 매일 아침 6시에 실행
-        sched.add_job(job, 'cron', hour=15, minute=45, id='cron_prices')
-        sched.add_job(job2, 'cron', hour=15, minute=45, id='cron_prices2')
+        sched.add_job(job, 'cron', hour=17, minute=35, id='cron_prices')
+        sched.add_job(job2, 'cron', hour=17, minute=35, id='cron_prices2')
         sched.start()
         scheduler_started = True
