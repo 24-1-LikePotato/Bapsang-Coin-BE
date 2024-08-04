@@ -37,6 +37,7 @@ class ActivateSubscriptionView(APIView):
 
 BASE_URL = 'https://zipbab-coin.p-e.kr/'
 
+
 KAKAO_CALLBACK_URI = BASE_URL + 'account/kakao/callback'
 
 
@@ -75,7 +76,7 @@ def kakao_callback(request):
     # 카카오 토큰을 헤더에 넣어 프로필 정보 받기 요청
     profile_request = requests.get(
         "https://kapi.kakao.com/v2/user/me",
-        headers={"Authorization": f"Bearer ${access_token}",})
+        headers={"Authorization": f"Bearer {access_token}",})
     
     if profile_request.status_code == 200:
         profile_json = profile_request.json()
@@ -135,6 +136,8 @@ def kakao_callback(request):
             },
             status=status.HTTP_200_OK
         )
+        
+        return res
         # redirect_url = f"{FRONTEND_URL}/login?access={access_token}&refresh={refresh_token}"
         # return HttpResponseRedirect(redirect_url)
 
