@@ -9,10 +9,10 @@ files:                 # 배포될 파일 및 디렉터리에 대한 정보
 hooks:                 # 배포 생명주기 이벤트에 대한 스크립트 지정
   ApplicationStop:    # 애플리케이션 중지 전에 실행될 스크립트
     - location: scripts/stop.sh   # 실행할 스크립트 위치
-      runas: root                 # 스크립트를 실행할 사용자 지정 (여기서는 root 사용자로 실행)
+      runas: ubuntu                 # 스크립트를 실행할 사용자 지정 (여기서는 root 사용자로 실행)
   AfterInstall:       # 파일 및 디렉터리가 복사된 후에 실행될 스크립트
     - location: scripts/initialize.sh   # 실행할 스크립트 위치
-      runas: root                           # 스크립트를 실행할 사용자 지정 (여기서는 root 사용자로 실행)
+      runas: ubuntu                           # 스크립트를 실행할 사용자 지정 (여기서는 root 사용자로 실행)
   ApplicationStart:   # 애플리케이션 시작 전에 실행될 스크립트
     - location: scripts/start.sh   # 실행할 스크립트 위치
-      runas: root                  # 스크립트를 실행할 사용자 지정 (여기서는 root 사용자로 실행)
+      runas: ubuntu                  # 스크립트를 실행할 사용자 지정 (여기서는 root 사용자로 실행)
