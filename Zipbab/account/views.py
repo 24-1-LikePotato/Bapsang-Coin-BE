@@ -51,6 +51,7 @@ def kakao_login(request):
 def kakao_callback(request):
     rest_api_key = config('SOCIAL_AUTH_KAKAO_CLIENT_ID')
     code = request.GET.get("code")
+    print(code)
     kakao_token_uri = "https://kauth.kakao.com/oauth/token"
   
     request_data = {
@@ -121,7 +122,7 @@ def kakao_callback(request):
 
         # 유저 생성할 때 냉장고 자동으로 생성하기
         fridge, created = Fridge.objects.get_or_create(user=user)
-        Fridge.save()
+        fridge.save()
 
         # 토큰 발급하기
         token = TokenObtainPairSerializer.get_token(user)
