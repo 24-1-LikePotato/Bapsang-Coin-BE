@@ -1,0 +1,39 @@
+name: deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  trigger_codepipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      
+      # 파일 및 폴더를 압축하여 server.zip으로 저장
+      - name: Zip distributions
+        run: zip -r server.zip .
+
+      # AWS 인증 정보 설정
+      - name: AWS configure credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          
+      # S3로 압축 파일 업로드
+      - name: upload to S3
+        run: aws s3 cp --region ${{ secrets.AWS_REGION }} ./server.zip s3://${{secrets.BUCKET_NAME}}/public/
+
+      - name: Create deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{secrets.CODEDEPLOY_APP_NAME}} \
+            --deployment-config-name CodeDeployDefault.OneAtATime \
+            --deployment-group-name ${{secrets.CODEDEPLOY_DG_NAME}} \
+            --s3-location bucket=${{secrets.BUCKET_NAME}},bundleType=zip,key=public/server.zip
