@@ -161,8 +161,12 @@ class RecipeSearchView(APIView):
         if ingredients.exists():
             ingredient_ids = ingredients.values_list('id', flat=True)
             recipe_ingredients = RecipeIngredient.objects.filter(ingredient__id__in=ingredient_ids)
+            if recipe_ingrediens is None:
+                return Response({"error": "No related recipes found"}, status=status.HTTP_400_BAD_REQUEST)
             recipe_ids = recipe_ingredients.values_list('recipe_id')
             recipes = Recipe.objects.filter(id__in=recipe_ids)
+            if recipes is None:
+                return Response({"error": "No related recipes found"}, status=status.HTTP_400_BAD_REQUEST)
             serializer = TodayRecipeSerializer(recipes, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
