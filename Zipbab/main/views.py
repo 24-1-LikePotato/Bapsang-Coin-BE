@@ -134,7 +134,8 @@ class MonthSearchView(APIView):
     def get(self, request):
         ingredient = request.GET.get('ingredient', None)
         if ingredient:
-            ingredients = Ingredient.objects.filter(name__icontains=ingredient).first()
+            ingredients = Ingredient.objects.filter(name__icontains=ingredient)
+            
             if ingredients is None:
                 return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
             ingredient_ids = ingredients.id
