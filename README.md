@@ -18,3 +18,4 @@
   - 예시: `git commit -m "feat: #1 로그인 구현"`
 
 -> cicd 테스트
+-> uwsgi 다시 실행되는지?
