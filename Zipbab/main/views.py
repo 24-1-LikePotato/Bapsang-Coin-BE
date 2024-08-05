@@ -163,7 +163,7 @@ class RecipeSearchView(APIView):
         if ingredients is None:
                 return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
         for i in ingredients:
-            if i.name == ingredient:
+            if i.name == ingredient or i.item == ingredient:
                 recipe_ingredients = RecipeIngredient.objects.filter(ingredient=i)
                 if recipe_ingredients is None:
                     return Response({"error": "No related recipes found"}, status=status.HTTP_400_BAD_REQUEST)
@@ -248,3 +248,16 @@ def recipe(request):
     
     except Exception as e:
         return Response({"error": str(e)}, status=500)
+
+class RecipeUpdateView(APIView):
+    serializer_class = RecipeSerializer
+
+    def put(self, request):
+        recipe_list = Recipe.objects.all()
+        
+        for i in recipe_list: 
+            i.content = i.content.replace('\n', '')
+            i.save()
+            print(f"{i.name}의 만드는 법이 업데이트 되었습니다.")
+
+        return Response({"status": "success"}, status=status.HTTP_200_OK)
