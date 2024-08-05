@@ -148,8 +148,8 @@ AUTH_USER_MODEL = 'account.User' # 커스텀 유저를 장고에서 사용하기
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        #'rest_framework.permissions.IsAuthenticated',  # 인증된 요청인지 확인
-        'rest_framework.permissions.AllowAny',  # 누구나 접근 가능 
+        'rest_framework.permissions.IsAuthenticated',  # 인증된 요청인지 확인
+        #'rest_framework.permissions.AllowAny',  # 누구나 접근 가능 
 				# (기본적으로 누구나 접근 가능하게 설정하고, 인증된 요청인지 확인하는 api를 따로 지정하게 하려면 
 				# 이 옵션을 위의 옵션 대신 켜주어도 됩니다!)
     ),
@@ -166,7 +166,7 @@ REST_USE_JWT = True
 SIMPLE_JWT = {
     'SIGNING_KEY': 'hellolikelionhellolikelion',
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=3),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
 }

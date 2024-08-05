@@ -38,7 +38,7 @@ class ActivateSubscriptionView(APIView):
 
 #BASE_URL = 'https://zipbab-coin.p-e.kr/'
 BASE_URL = 'http://localhost:3000/'
-
+#프론트 주소로 할 것
 KAKAO_CALLBACK_URI = BASE_URL + 'account/kakao/callback'
 
 @permission_classes([AllowAny])
