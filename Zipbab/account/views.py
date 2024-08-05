@@ -8,9 +8,10 @@ from django.http import JsonResponse
 
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, APIView
+from rest_framework.decorators import api_view, APIView, permission_classes
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import AllowAny
 
 import requests
 from decouple import config
@@ -35,18 +36,18 @@ class ActivateSubscriptionView(APIView):
 # 나중에 배포하면 꼭 바꾸기 = 카카오 디벨로퍼에서 바꿔야함!
 # 지금 클라이언트 ID도 테스트앱의 ID라 나중에 원래 앱의 클라이언트 ID로 바꿔야 함
 
-BASE_URL = 'https://zipbab-coin.p-e.kr/'
-
+#BASE_URL = 'https://zipbab-coin.p-e.kr/'
+BASE_URL = 'http://localhost:3000/'
 
 KAKAO_CALLBACK_URI = BASE_URL + 'account/kakao/callback'
 
-
+@permission_classes([AllowAny])
 def kakao_login(request):
     client_id = config('SOCIAL_AUTH_KAKAO_CLIENT_ID')
     return redirect(f"https://kauth.kakao.com/oauth/authorize?client_id={client_id}&redirect_uri={KAKAO_CALLBACK_URI}&response_type=code&scope=profile_nickname,profile_image,account_email")
 
 
-
+@permission_classes([AllowAny])
 @api_view(['GET'])
 def kakao_callback(request):
     rest_api_key = config('SOCIAL_AUTH_KAKAO_CLIENT_ID')
@@ -141,7 +142,6 @@ def kakao_callback(request):
         return res
         # redirect_url = f"{FRONTEND_URL}/login?access={access_token}&refresh={refresh_token}"
         # return HttpResponseRedirect(redirect_url)
-
 
 class LogoutView(APIView):
     def post(self, request):
