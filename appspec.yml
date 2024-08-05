@@ -5,7 +5,7 @@ files:                 # 배포될 파일 및 디렉터리에 대한 정보
   - source: /          # 소스 디렉터리 지정 (루트 디렉터리)
     destination: /home/ubuntu/Zipbab-Coin-BE  # 대상 디렉터리 지정
     overwrite: yes     # 이미 존재하는 파일 또는 디렉터리를 덮어쓸지 결정
-
+file_exists_behavior: OVERWRITE
 permissions:
     - object: /home/ubuntu
       pattern: '**'
