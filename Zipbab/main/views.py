@@ -256,7 +256,7 @@ class RecipeUpdateView(APIView):
         recipe_list = Recipe.objects.all()
         
         for i in recipe_list: 
-            i.content = i.content.replace('\n', '')
+            i.content = i.content.replace('\n', ' ')
             i.save()
             print(f"{i.name}의 만드는 법이 업데이트 되었습니다.")
 
