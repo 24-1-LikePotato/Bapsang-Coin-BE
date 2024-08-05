@@ -16,3 +16,5 @@
 - `merge`: 다른 브랜치와 병합
 
   - 예시: `git commit -m "feat: #1 로그인 구현"`
+
+(cicd 반영 테스트)
