@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from rest_framework.decorators import api_view
 from .models import Ingredient, Recipe,Fridge,FridgeIngredient,User, RecipeIngredient
 from price.models import ChangePriceDay,ChangePriceMonth2
@@ -134,11 +135,13 @@ class MonthSearchView(APIView):
     def get(self, request):
         ingredient = request.GET.get('ingredient', None)
         if ingredient:
-            ingredients = Ingredient.objects.filter(name__icontains=ingredient)
+            ingredients = Ingredient.objects.filter(
+                Q(name__icontains=ingredient) | Q(item__icontains=ingredient)
+            )
             if ingredients is None:
                 return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
             for i in ingredients:
-                if i.name == ingredient:
+                if i.name == ingredient or i.item == ingredient:
                     ingredient_ids = i.id
                     dayprice = ChangePriceDay.objects.filter(ingredient=i).first()
                     if dayprice is None:
@@ -151,7 +154,21 @@ class MonthSearchView(APIView):
                     dayprice_serializer = ChangePriceDaySerializer(dayprice)
                     monthprice_serializer = ChangePriceMonthSerializer(monthprice)
                     return Response({"dayprice": dayprice_serializer.data, "monthprice": monthprice_serializer.data})
-            return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
+            find_ingredient = Ingredient.objects.filter(name__icontains=ingredient).first()
+            if find_ingredient:
+                dayprice = ChangePriceDay.objects.filter(ingredient=find_ingredient).first()
+                if dayprice is None:
+                    return Response({"error": "No price data available"}, status=status.HTTP_400_BAD_REQUEST)
+                monthprice = ChangePriceMonth2.objects.filter(ingredient=find_ingredient).first()
+                if monthprice is None:
+                    return Response({"error": "No price data available"}, status=status.HTTP_400_BAD_REQUEST)
+
+                # 직렬화 및 응답
+                dayprice_serializer = ChangePriceDaySerializer(dayprice)
+                monthprice_serializer = ChangePriceMonthSerializer(monthprice)
+                return Response({"dayprice": dayprice_serializer.data, "monthprice": monthprice_serializer.data})
+            else:
+                return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
 
 #레시피 검색
@@ -159,7 +176,9 @@ class RecipeSearchView(APIView):
     def get(self, request):
         ingredient=request.GET.get('ingredient', None)
         print(ingredient)
-        ingredients = Ingredient.objects.filter(name__icontains=ingredient)
+        ingredients = Ingredient.objects.filter(
+            Q(name__icontains=ingredient) | Q(item__icontains=ingredient)
+        )
         if ingredients is None:
                 return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
         for i in ingredients:
@@ -173,6 +192,19 @@ class RecipeSearchView(APIView):
                     return Response({"error": "No related recipes found"}, status=status.HTTP_400_BAD_REQUEST)
                 serializer = TodayRecipeSerializer(recipes, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
+        find_ingredient = Ingredient.objects.filter(name__icontains=ingredient).first()
+        if find_ingredient:
+            recipe_ingredients = RecipeIngredient.objects.filter(ingredient=find_ingredient)
+            if recipe_ingredients is None:
+                return Response({"error": "No related recipes found"}, status=status.HTTP_400_BAD_REQUEST)
+            recipe_ids = recipe_ingredients.values_list('recipe_id')
+            recipes = Recipe.objects.filter(id__in=recipe_ids)
+            if recipes is None:
+                return Response({"error": "No related recipes found"}, status=status.HTTP_400_BAD_REQUEST)
+            serializer = TodayRecipeSerializer(recipes, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"error": "No related recipes found"}, status=status.HTTP_404_NOT_FOUND)
 
 
