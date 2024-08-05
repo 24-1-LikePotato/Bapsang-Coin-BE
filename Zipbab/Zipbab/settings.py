@@ -166,8 +166,8 @@ REST_USE_JWT = True
 
 SIMPLE_JWT = {
     'SIGNING_KEY': 'hellolikelionhellolikelion',
-    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=15),
-    'REFRESH_TOKEN_LIFETIME': timedelta(hours=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(seconds=15),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
 }
