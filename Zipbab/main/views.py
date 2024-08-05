@@ -135,22 +135,23 @@ class MonthSearchView(APIView):
         ingredient = request.GET.get('ingredient', None)
         if ingredient:
             ingredients = Ingredient.objects.filter(name__icontains=ingredient)
-            
             if ingredients is None:
                 return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
-            ingredient_ids = ingredients.id
-            dayprice = ChangePriceDay.objects.filter(ingredient=ingredients).first()
-            if dayprice is None:
-                return Response({"error": "No price data available"}, status=status.HTTP_400_BAD_REQUEST)
-            monthprice = ChangePriceMonth2.objects.filter(ingredient__id=ingredient_ids).first()
-            if monthprice is None:
-                return Response({"error": "No price data available"}, status=status.HTTP_400_BAD_REQUEST)
+            for i in ingredients:
+                if i.name == ingredient:
+                    ingredient_ids = ingredients.id
+                    dayprice = ChangePriceDay.objects.filter(ingredient=ingredients).first()
+                    if dayprice is None:
+                        return Response({"error": "No price data available"}, status=status.HTTP_400_BAD_REQUEST)
+                    monthprice = ChangePriceMonth2.objects.filter(ingredient__id=ingredient_ids).first()
+                    if monthprice is None:
+                        return Response({"error": "No price data available"}, status=status.HTTP_400_BAD_REQUEST)
 
-             # 직렬화 및 응답
-            dayprice_serializer = ChangePriceDaySerializer(dayprice)
-            monthprice_serializer = ChangePriceMonthSerializer(monthprice)
-            return Response({"dayprice": dayprice_serializer.data, "monthprice": monthprice_serializer.data})
-
+                    # 직렬화 및 응답
+                    dayprice_serializer = ChangePriceDaySerializer(dayprice)
+                    monthprice_serializer = ChangePriceMonthSerializer(monthprice)
+                    return Response({"dayprice": dayprice_serializer.data, "monthprice": monthprice_serializer.data})
+            return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
 
 #레시피 검색
