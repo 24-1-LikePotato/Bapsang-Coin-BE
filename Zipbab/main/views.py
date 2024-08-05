@@ -282,14 +282,17 @@ def recipe(request):
         return Response({"error": str(e)}, status=500)
 
 class RecipeUpdateView(APIView):
-    serializer_class = RecipeSerializer
-
     def put(self, request):
-        recipe_list = Recipe.objects.all()
-        
-        for i in recipe_list: 
-            i.content = i.content.replace('\n', ' ')
-            i.save()
-            print(f"{i.name}의 만드는 법이 업데이트 되었습니다.")
+        recipe_name = request.GET.get('name', '').strip()
+        if not recipe_name:
+            return Response({"error": "Recipe name not provided"}, status=400)
+            
+        recipe_detail = Recipe.objects.filter(name=recipe_name).first()
+        if not recipe_detail:
+            return Response({"error": "Recipe not found"}, status=404)
+            
+        recipe_detail.name = recipe_detail.name.replace('와 ', '과 ')
+        recipe_detail.save()
+        print(f"{recipe_detail.name} 의 이름이 업데이트 되었습니다.")
 
         return Response({"status": "success"}, status=status.HTTP_200_OK)
