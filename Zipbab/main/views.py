@@ -160,19 +160,20 @@ class RecipeSearchView(APIView):
         ingredient=request.GET.get('ingredient', None)
         print(ingredient)
         ingredients = Ingredient.objects.filter(name__icontains=ingredient)
-        if ingredients.exists():
-            ingredient_ids = ingredients.values_list('id', flat=True)
-            recipe_ingredients = RecipeIngredient.objects.filter(ingredient__id__in=ingredient_ids)
-            if recipe_ingrediens is None:
-                return Response({"error": "No related recipes found"}, status=status.HTTP_400_BAD_REQUEST)
-            recipe_ids = recipe_ingredients.values_list('recipe_id')
-            recipes = Recipe.objects.filter(id__in=recipe_ids)
-            if recipes is None:
-                return Response({"error": "No related recipes found"}, status=status.HTTP_400_BAD_REQUEST)
-            serializer = TodayRecipeSerializer(recipes, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"error": "No related recipes found"}, status=status.HTTP_404_NOT_FOUND)
+        if ingredients is None:
+                return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
+        for i in ingredients:
+            if i.name == ingredient:
+                recipe_ingredients = RecipeIngredient.objects.filter(ingredient=i)
+                if recipe_ingredients is None:
+                    return Response({"error": "No related recipes found"}, status=status.HTTP_400_BAD_REQUEST)
+                recipe_ids = recipe_ingredients.values_list('recipe_id')
+                recipes = Recipe.objects.filter(id__in=recipe_ids)
+                if recipes is None:
+                    return Response({"error": "No related recipes found"}, status=status.HTTP_400_BAD_REQUEST)
+                serializer = TodayRecipeSerializer(recipes, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"error": "No related recipes found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 #냉장고 기능 
