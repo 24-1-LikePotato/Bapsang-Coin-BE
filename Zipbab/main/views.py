@@ -139,8 +139,8 @@ class MonthSearchView(APIView):
                 return Response({"error": "Invalid ingredient or no data found"}, status=status.HTTP_400_BAD_REQUEST)
             for i in ingredients:
                 if i.name == ingredient:
-                    ingredient_ids = ingredients.id
-                    dayprice = ChangePriceDay.objects.filter(ingredient=ingredients).first()
+                    ingredient_ids = i.id
+                    dayprice = ChangePriceDay.objects.filter(ingredient=i).first()
                     if dayprice is None:
                         return Response({"error": "No price data available"}, status=status.HTTP_400_BAD_REQUEST)
                     monthprice = ChangePriceMonth2.objects.filter(ingredient__id=ingredient_ids).first()
