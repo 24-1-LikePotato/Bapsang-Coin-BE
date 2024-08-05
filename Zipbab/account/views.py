@@ -46,9 +46,8 @@ def kakao_login(request):
     client_id = config('SOCIAL_AUTH_KAKAO_CLIENT_ID')
     return redirect(f"https://kauth.kakao.com/oauth/authorize?client_id={client_id}&redirect_uri={KAKAO_CALLBACK_URI}&response_type=code&scope=profile_nickname,profile_image,account_email")
 
-
-@permission_classes([AllowAny])
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def kakao_callback(request):
     rest_api_key = config('SOCIAL_AUTH_KAKAO_CLIENT_ID')
     code = request.GET.get("code")
