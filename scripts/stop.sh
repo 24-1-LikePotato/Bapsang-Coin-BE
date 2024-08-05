@@ -11,19 +11,3 @@ if [ -n "$uwsgi_pids" ]; then
 else
     echo "No uWSGI processes found."
 fi
-
-# 추가적으로 남아있는 uWSGI 프로세스 확인 및 종료
-remaining_pids=$(pgrep -f "uwsgi --ini uwsgi.ini")
-if [ -n "$remaining_pids" ]; then
-    echo "Found remaining uWSGI processes. Stopping them with PIDs: $remaining_pids"
-    kill -9 $remaining_pids
-    echo "Remaining uWSGI processes stopped."
-fi
-
-# 프로세스가 완전히 종료되었는지 확인
-sleep 2
-if pgrep -f "uwsgi --ini uwsgi.ini" > /dev/null; then
-    echo "Warning: Some uWSGI processes may still be running."
-else
-    echo "All uWSGI processes have been successfully terminated."
-fi
