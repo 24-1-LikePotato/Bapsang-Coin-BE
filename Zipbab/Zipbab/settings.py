@@ -104,6 +104,7 @@ CORS_ALLOWED_ORIGINS = [  # 허용할 오리진
     "https://zipbab-coin.p-e.kr",
     "https://zipbab-coin-pwa-test.vercel.app",
     "http://zipbab-s3.s3-website.ap-northeast-2.amazonaws.com",
+    "https://zipbap-coin-fe.vercel.app"
 ]
 
 ROOT_URLCONF = 'Zipbab.urls'
