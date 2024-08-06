@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
     'zipbab-coin.p-e.kr',
     '13.124.33.210',
     'zipbab-s3.s3-website.ap-northeast-2.amazonaws.com',
+    'zipbap-coin-fe.vercel.app',
 ]
 
 INSTALLED_APPS = [
