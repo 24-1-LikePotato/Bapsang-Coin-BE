@@ -36,8 +36,8 @@ class ActivateSubscriptionView(APIView):
 # 나중에 배포하면 꼭 바꾸기 = 카카오 디벨로퍼에서 바꿔야함!
 # 지금 클라이언트 ID도 테스트앱의 ID라 나중에 원래 앱의 클라이언트 ID로 바꿔야 함
 
-#BASE_URL = 'https://zipbab-coin.p-e.kr/'
-BASE_URL = 'http://localhost:3000/'
+BASE_URL = 'https://zipbap-coin-fe.vercel.app/'
+
 #프론트 주소로 할 것
 KAKAO_CALLBACK_URI = BASE_URL + 'account/kakao/callback'
 
@@ -112,8 +112,7 @@ def kakao_callback(request):
         )
 
         return res
-        #redirect_url = f"{FRONTEND_URL}/login?access={access_token}&refresh={refresh_token}"
-        #return HttpResponseRedirect(redirect_url)
+        
     
     # 유저 정보가 없으면 회원가입 후 로그인하기
     except User.DoesNotExist:
@@ -139,8 +138,7 @@ def kakao_callback(request):
         )
         
         return res
-        # redirect_url = f"{FRONTEND_URL}/login?access={access_token}&refresh={refresh_token}"
-        # return HttpResponseRedirect(redirect_url)
+       
 
 class LogoutView(APIView):
     def post(self, request):
